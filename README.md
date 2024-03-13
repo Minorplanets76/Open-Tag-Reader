@@ -1,5 +1,6 @@
-![Yeet]
-# Open-Tag-Reader
+![alt text](image.png)   
+# Open-Tag-Reader  
+
 Animal EID tag reading
 
 Respository for Open Source Tag Reader. Built in response to [mandatory introduction](https://www.dpi.nsw.gov.au/dpi/bfs/your-role-in-biosecurity/primary-producers/nlis/eID#:~:text=NSW%20is%20currently%20transitioning%20to,Livestock%20Identification%20System%20(NLIS).) of eID tags for sheep in NSW, Australia. Intent is to develop tag readers and associated software for easy DIY.
