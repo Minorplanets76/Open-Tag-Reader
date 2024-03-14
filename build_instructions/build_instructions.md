@@ -4,8 +4,8 @@
 |---------|:---:|--------|
 |Tag reader board|1|[FDX-B/HDX RFID Reader Writer with TTL serial port](https://www.priority1design.com.au/shopfront/index.php?main_page=product_info&cPath=1&products_id=10)|
 Right angle header|1|  |
-|Reader/Antenna Carrier|1|3D Print|
-|Shroud|1|3D Print|
+|Reader/Antenna Carrier|1|[3D Print - Coil Reader](/3d_print_files/)|
+|Shroud|1|[3D Print - Coil Reader Shroud](/3d_print_files/)|
 |LilyGo Embed|1|[T-Embed](https://www.lilygo.cc/products/t-embed)|
 |Connecting wire|1|Ribbon cable and Dupont connectors|
 |LiPo Battery|1| |
@@ -13,9 +13,9 @@ Right angle header|1|  |
 |Boost converter|1| |
 |JST Y Cable|1|  |
 |USB connector| 1| |
-|Battery Holder|1|3D Print|
-|Screen adapter|1|3D Print|
-|End cap|1|3d Print|
+|Battery Holder|1|[3D Print](/3d_print_files/)|
+|Screen adapter|1|[3D Print](/3d_print_files/)|
+|End cap|1|[3D Print](/3d_print_files/)|
 
 ## Prepare Reader Board
 1. Solder right angle header.
