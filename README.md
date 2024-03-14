@@ -1,4 +1,4 @@
-![alt text](image.png)   
+![alt text](/images/logo.png)   
 # Open-Tag-Reader  
 
 Animal EID tag reading
@@ -16,13 +16,14 @@ I chose an Australian product from  [Priority 1 Design](https://www.priority1des
 #### Board Carrier and Antenna Holder
 The board fits inside the pipe but the standard 49mm antenna is a bit big.  The antenna wire is diabolically fine, so I designed up a carrier that holds the board and antenna, whilst also acting as a soldering jig for the fine antenna wires to A+ and A-.
 
-I soldered right angle headers to the J2 position.  This is the 3.3V header, which is a bit more convenient, plus this way it points up the pipe.  I'm just using Dupont connectors.
-
 ### User Interface
 
 
 
 
+
+### Build Instructions
+See [build instructions](/build_instructions/build_instructions.md)
 
 # Further Information
 https://www.integritysystems.com.au/siteassets/nlis-rfid-standards.pdf
