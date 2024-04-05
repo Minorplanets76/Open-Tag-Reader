@@ -14,6 +14,15 @@ T-Display has another JST connector with SDAS/SCL on IO02 & IO03.  Maybe just us
 https://randomnerdtutorials.com/esp32-write-data-littlefs-arduino/
 https://randomnerdtutorials.com/esp32-data-logging-temperature-to-microsd-card/
 
+Time - Can be NTP client https://randomnerdtutorials.com/esp32-ntp-client-date-time-arduino-ide/, otherwise RTC.  I have DS3231 minis.  The pinout for these are as follows 
+
+`Pin 1 (square) = 5V or 3.3V "+"
+Pin 2 = SDA "D" is data
+Pin 3 = SCL "C" is clock
+Pin 4 = not connected "NC" is Not Connected
+Pin 5 = GND "-" is GND`
+
+
 #### Sharing Files
 Simplest way is probably to have a simple HTTP File Server.
 https://randomnerdtutorials.com/esp32-web-server-microsd-card/

@@ -9,10 +9,10 @@
 
 #define WIFI_CONNECT_WAIT_MAX (30 * 1000)
 
-#define NTP_SERVER1           "pool.ntp.org"
-#define NTP_SERVER2           "time.nist.gov"
-#define GMT_OFFSET_SEC        (3600 * 8)
-#define DAY_LIGHT_OFFSET_SEC  0
+#define NTP_SERVER1           "au.pool.ntp.org"
+#define NTP_SERVER2           "pool.ntp.org"
+#define GMT_OFFSET_SEC        (3600 * 10)
+#define DAY_LIGHT_OFFSET_SEC  3600
 
 #define LV_SCREEN_WIDTH       320
 #define LV_SCREEN_HEIGHT      170
