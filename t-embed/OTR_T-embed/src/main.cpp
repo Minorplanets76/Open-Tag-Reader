@@ -3,14 +3,14 @@
 #include "pin_config.h"
 #include "Audio.h"
 #include "FS.h"
-#include "SPIFFS.h"
+#include "LittleFS.h"
 #include "SD_MMC.h"
 #include "RTClib.h"
 #include "Wire.h"
 #include <WiFi.h>
 #include "time.h"
 #include <CSV_Parser.h>
-#include <vector>
+#include <LITTLEFS.h>
 
 TFT_eSPI tft = TFT_eSPI();
 Audio *audio;
@@ -23,6 +23,8 @@ RTC_DS3231 rtc;
 void SD_init(void);
 void splash_screen(void);
 void read_bucket_file(void);
+void read_tags_file(void);
+void update_tag_status_list(void);
 void set_RTC(byte& year, byte& month, byte& date, byte& dOW,
                   byte& hour, byte& minute, byte& second);
 void printLocalTime(void);
@@ -43,6 +45,7 @@ char **RFID;
 char **Visual_ID;
 char **NLISID;
 char **tagColour;
+char **tagStatus;
 
 
 typedef struct {
@@ -97,17 +100,17 @@ void setup()
   digitalWrite(PIN_LCD_BL, HIGH);
   tft.setSwapBytes(true);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawString("Open Tag Reader", 40, 75, 4);
+  tft.drawString("Open Tag Reader", 60, 75, 4);
 
-  bool ret = SPIFFS.begin();
-  while (!ret) {
-    Serial.println("SPIFFS not mounted"); delay(1000);
+  if(!LittleFS.begin()){
+    Serial.println("An Error has occurred while mounting LittleFS"); delay(1000);
+    return;
   }
 
   audio = new Audio(0, 3, 1);
   audio->setPinout(PIN_IIS_BCLK, PIN_IIS_WCLK, PIN_IIS_DOUT);
   audio->setVolume(21); // 0...21
-  if (!audio->connecttoFS(SPIFFS, "start.mp3")) {
+  if (!audio->connecttoFS(LittleFS, "/sounds/start.mp3")) {
     Serial.println("Start.mp3 not found"); while (1)delay(1000);
   }
  
@@ -137,8 +140,8 @@ rtc.adjust(DateTime(timeinfo.tm_year+1900,timeinfo.tm_mon+1,timeinfo.tm_mday,
 printLocalTime();
 
 delay(1000);
-Serial.printf("SPIFFS totalBytes : %d kb\r\n", SPIFFS.totalBytes() / 1024);
-Serial.printf("SPIFFS usedBytes : %d kb\r\n", SPIFFS.usedBytes() / 1024);
+Serial.printf("LittleFS totalBytes : %d kb\r\n", LittleFS.totalBytes() / 1024);
+Serial.printf("LittleFS usedBytes : %d kb\r\n", LittleFS.usedBytes() / 1024);
 tft.setRotation(2);
 tft.fillScreen(TFT_BLACK);
 SD_init();
@@ -146,6 +149,8 @@ SD_init();
 
 splash_screen();
 read_bucket_file();
+read_tags_file();
+update_tag_status_list();
 
 }
 
@@ -155,7 +160,7 @@ void loop()
   if (Serial.available()) {
     String teststr = Serial.readString();  //read until timeout
     teststr.trim();
-    audio->connecttoFS(SPIFFS, "scanbad.mp3");
+    audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
     tft.fillScreen(TFT_BLACK);
     tft.drawString(teststr, 10, 10, 4);
     Serial.println(teststr);
@@ -167,7 +172,7 @@ void loop()
     String otrstr = Serial1.readString();  //read until timeout
     otrstr.trim();
     otrstr.replace("_"," ");
-    audio->connecttoFS(SPIFFS, "scangood.mp3");
+    audio->connecttoFS(LittleFS, "/sounds/scangood.mp3");
     audio->loop();
     tft.fillScreen(TFT_GREEN);
     delay(100);
@@ -210,8 +215,8 @@ void splash_screen(void) {  //Screen with memory parameters
     tft.printf(" SD Card used: %lluMB\n", cardUsed);
     tft.printf(" psram size: %d kb\r\n", ESP.getPsramSize() / 1024);
     tft.printf(" FLASH size: %d kb\r\n", ESP.getFlashChipSize() / 1024);
-    tft.printf(" SPIFFS total: %d kb\r\n", SPIFFS.totalBytes() / 1024);
-    tft.printf(" SPIFFS used: %d kb\r\n", SPIFFS.usedBytes() / 1024);
+    tft.printf(" LittleFS total: %d kb\r\n", LittleFS.totalBytes() / 1024);
+    tft.printf(" LittleFS used: %d kb\r\n", LittleFS.usedBytes() / 1024);
     // Display the temperature
 	tft.printf(" Temperature: %.1f `C\r\n", rtc.getTemperature());
     //Dsiplay RTC time and date
@@ -278,9 +283,9 @@ void printLocalTime()   {
 
 void read_bucket_file() {   //Reads in a bucket file (Shearwell)
     //Add new tags to tags.csv which represents all tags available.  Prevent duplicates
-    File bucketFile = SPIFFS.open("/test_bucket.csv");
+    File bucketFile = LittleFS.open("/test_bucket.csv");
     if(!bucketFile){
-        Serial.println("Failed to open file for reading");
+        Serial.println("Failed to open ""test_bucket.csv"" for reading");
         return;
     }
     String csvBucket;
@@ -288,13 +293,53 @@ void read_bucket_file() {   //Reads in a bucket file (Shearwell)
         csvBucket += (char)bucketFile.read();
     }
     bucketFile.close();
-    CSV_Parser bucket(csvBucket.c_str(),"sssssss");
+    CSV_Parser bucket(csvBucket.c_str(),"-ssss-s");
     // bucket.print();
     RFID = (char**)bucket["RFID"];
     Visual_ID = (char**)bucket["Visual_ID"];
     NLISID = (char**)bucket["NLISID"];
     tagColour = (char**)bucket["Colour"];
-    Serial.print("CSV Rows: ");
+    Serial.print("Bucket File Rows: ");
     Serial.println(bucket.getRowsCount());
-   
+    
+
+}
+void read_tags_file()   {
+
+    File tagFile = LittleFS.open("/tags.csv");
+    if(!tagFile){
+        Serial.println("Failed to open ""tags.csv"" for reading");
+        return;
+    } else {
+        Serial.println("tags.csv opened");
+    }
+    String csvTags;
+    while(tagFile.available())  {
+        csvTags += (char)tagFile.read();
+    }
+    tagFile.close();
+    Serial.println("tags.csv closed");
+
+}
+
+void update_tag_status_list()   {
+    // Placeholder for function to enable user to have list of tag status
+    // Currently reads tag_status.csv 
+    File tagStatusFile = LittleFS.open("/tag_status.csv");
+    if(!tagStatusFile){
+        Serial.println("Failed to open tags_status.csv for reading");
+        return;
+    } else {
+        Serial.println("tag_status.csv opened");
+    }
+    String csvStatus;
+    while(tagStatusFile.available())  {
+        csvStatus += (char)tagStatusFile.read();
+    }
+    CSV_Parser tagStatusList(csvStatus.c_str(),"uc",false);
+    tagStatus = (char**)tagStatusList[0];
+    for(int row = 0; row < tagStatusList.getRowsCount(); row++) {
+        Serial.printf("Row: %i Status: %s", row, tagStatus[row]);
+    }
+
 }
