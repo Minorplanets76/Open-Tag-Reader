@@ -28,6 +28,7 @@ void update_tag_status_list(void);
 void set_RTC(byte& year, byte& month, byte& date, byte& dOW,
                   byte& hour, byte& minute, byte& second);
 void printLocalTime(void);
+bool validateRFID(const String& inputString);
 
 #define RXD1 16
 #define TXD1 17
@@ -172,36 +173,33 @@ void loop()
     String otrstr = Serial1.readString();  //read until timeout
     otrstr.trim();
     otrstr.replace("_"," ");
-    audio->connecttoFS(LittleFS, "/sounds/scangood.mp3");
-    audio->loop();
-    tft.fillScreen(TFT_GREEN);
-    delay(100);
-    tft.fillScreen(TFT_BLACK);
-    tft.drawCentreString(otrstr, 85, 10, 2);
-    Serial.println(otrstr);
-    for(int row =0; row < 150; row++)   {
-        
-        if (String(RFID[row]) == otrstr)    {
-            tft.drawCentreString(NLISID[row], 85, 30, 2);
-            tft.drawCentreString(String(Visual_ID[row]).substring(0,4), 85, 100, 4);
-            tft.drawCentreString(String(Visual_ID[row]).substring(5,8), 85, 140, 8);
-            tft.drawCentreString(tagColour[row], 85, 240, 4);
-            Serial.print("Tag number: ");
-            Serial.println(row+1);
-            Serial.println(Visual_ID[row]);
-            Serial.println(NLISID[row]);
-            break;
-        } else {
+    if(validateRFID(otrstr))    {
+        audio->connecttoFS(LittleFS, "/sounds/scangood.mp3");
+        audio->loop();
+        tft.fillScreen(TFT_GREEN);
+        delay(100);
+        tft.fillScreen(TFT_BLACK);
+        tft.drawCentreString(otrstr, 85, 10, 2);
+        Serial.println(otrstr);
+        for(int row =0; row < 150; row++)   {
             
+            if (String(RFID[row]) == otrstr)    {
+                tft.drawCentreString(NLISID[row], LV_SCREEN_HEIGHT/2, 30, 2);
+                tft.drawCentreString(String(Visual_ID[row]).substring(0,4), LV_SCREEN_HEIGHT/2, 100, 4);
+                tft.drawCentreString(String(Visual_ID[row]).substring(5,8), LV_SCREEN_HEIGHT/2, 140, 8);
+                tft.drawCentreString(tagColour[row], LV_SCREEN_HEIGHT/2, 240, 4);
+                Serial.print("Tag number: ");
+                Serial.println(row+1);
+                Serial.println(Visual_ID[row]);
+                Serial.println(NLISID[row]);
+                break;
+            } else {
+                
+            }
         }
     }
 
-
-    
-
-
-  }
-
+}
 }
 
 void splash_screen(void) {  //Screen with memory parameters
@@ -282,7 +280,6 @@ void printLocalTime()   {
 }
 
 void read_bucket_file() {   //Reads in a bucket file (Shearwell)
-    //Add new tags to tags.csv which represents all tags available.  Prevent duplicates
     File bucketFile = LittleFS.open("/test_bucket.csv");
     if(!bucketFile){
         Serial.println("Failed to open ""test_bucket.csv"" for reading");
@@ -294,13 +291,13 @@ void read_bucket_file() {   //Reads in a bucket file (Shearwell)
     }
     bucketFile.close();
     CSV_Parser bucket(csvBucket.c_str(),"-ssss-s");
-    // bucket.print();
+    //bucket.print();
     RFID = (char**)bucket["RFID"];
     Visual_ID = (char**)bucket["Visual_ID"];
     NLISID = (char**)bucket["NLISID"];
     tagColour = (char**)bucket["Colour"];
-    Serial.print("Bucket File Rows: ");
-    Serial.println(bucket.getRowsCount());
+    // Serial.print("Bucket File Rows: ");
+    // Serial.println(bucket.getRowsCount());
     
 
 }
@@ -318,13 +315,15 @@ void read_tags_file()   {
         csvTags += (char)tagFile.read();
     }
     tagFile.close();
+    CSV_Parser allTagsList(csvTags.c_str(),"sssssuc"); 
+    allTagsList.print();
     Serial.println("tags.csv closed");
 
 }
 
 void update_tag_status_list()   {
     // Placeholder for function to enable user to have list of tag status
-    // Currently reads tag_status.csv 
+    // Currently reads tag_status.csv and populates tagStaus as array
     File tagStatusFile = LittleFS.open("/tag_status.csv");
     if(!tagStatusFile){
         Serial.println("Failed to open tags_status.csv for reading");
@@ -336,10 +335,40 @@ void update_tag_status_list()   {
     while(tagStatusFile.available())  {
         csvStatus += (char)tagStatusFile.read();
     }
-    CSV_Parser tagStatusList(csvStatus.c_str(),"uc",false);
+    CSV_Parser tagStatusList(csvStatus.c_str(),"s",false);
     tagStatus = (char**)tagStatusList[0];
-    for(int row = 0; row < tagStatusList.getRowsCount(); row++) {
-        Serial.printf("Row: %i Status: %s", row, tagStatus[row]);
-    }
+    // for(int row = 0; row < tagStatusList.getRowsCount(); row++) {
+    //     Serial.printf("Row: %i Status: %s \r\n", row, tagStatus[row]);
+    // }
+}
 
+bool validateRFID(const String& inputString)    {
+    if (inputString.length() != 16) {
+        //not a dog by any chance?
+        if(inputString == "940 110030991 001003301901") {
+            //That's Redge!
+            audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
+            tft.fillScreen(TFT_ORANGE);
+            tft.setTextColor(TFT_BLACK);
+            tft.drawCentreString("THAT'S", LV_SCREEN_HEIGHT/2, 55,4);
+            tft.drawCentreString("REDGE!", LV_SCREEN_HEIGHT/2, 90,4);
+            tft.setTextColor(TFT_WHITE, TFT_BLACK);
+            return false;
+        }
+        audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
+        tft.fillScreen(TFT_RED);
+        tft.setTextColor(TFT_BLACK);
+        tft.drawCentreString("INVALID", LV_SCREEN_HEIGHT/2, 55,4);
+        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        return false;
+    }
+    if (inputString.substring(0, 3) != "940") {
+        audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
+        tft.fillScreen(TFT_RED);
+        tft.setTextColor(TFT_BLACK);
+        tft.drawCentreString("INVALID", LV_SCREEN_HEIGHT/2, 55,4);
+        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        return false;
+    }
+    return true;
 }
