@@ -25,8 +25,6 @@ APA102<PIN_APA102_DI, PIN_APA102_CLK> ledStrip;
 EventGroupHandle_t global_event_group;
 QueueHandle_t led_setting_queue;
 
-
-
 void SD_init(void);
 void splash_screen(void);
 void read_bucket_file(void);
@@ -90,7 +88,8 @@ uint8_t *tagLocation;
 uint16_t numTags;
 uint16_t numActiveTags;
 uint16_t LEDmode = 0;
-uint16_t newLEDmode;
+uint16_t newLEDmode = 0;
+uint16_t brightness = 30;
 
 typedef struct {
   uint8_t cmd;
@@ -189,6 +188,9 @@ Serial.printf("LittleFS usedBytes : %d kb\r\n", LittleFS.usedBytes() / 1024);
 tft.setRotation(2);
 tft.fillScreen(TFT_BLACK);
 SD_init();
+
+led_setting_queue = xQueueCreate(5, sizeof(uint16_t));
+
 xTaskCreatePinnedToCore(led_task, "led_task", 1024 * 2, led_setting_queue, 0, NULL, 0);
 
 splash_screen();
@@ -202,7 +204,7 @@ read_tags_file();
 //add_tags_from_file();
 //printFileContents("/test_bucket2.csv");
 
-LEDmode = 2;
+LEDmode = 4;
 
 }
 
@@ -229,8 +231,9 @@ void loop()
         bool isActiveTag = false;
         if(!validateRFID(RFID))   {
             Serial.println("Failed validation check");
-            newLEDmode = 5;
-            //xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
+                LEDmode = 3;
+                newLEDmode = (LEDmode << 6) | (brightness & 0x3F);
+                xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
             
         } else{
             int row = 0;
@@ -238,14 +241,16 @@ void loop()
                 Serial.println("Not active");
                 audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
                 Serial.println("Tag not found in active_tags.csv");
-                newLEDmode = 4;
-                //xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
+                LEDmode = 2;
+                newLEDmode = (LEDmode << 6) | (brightness & 0x3F);
+                xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
             } else {
                 Serial.println("Active");
                 displaySuccessfulScan(row);
                 audio->connecttoFS(LittleFS, "/sounds/scangood.mp3");
-                newLEDmode = 2;
-                //xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
+                LEDmode = 1;
+                newLEDmode = (LEDmode << 6) | (brightness & 0x3F);
+                xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
             }
         }
     }
@@ -737,58 +742,71 @@ void displaySuccessfulScan(int& row) {
 }
 
 
-void led_task(void *param)
-{   
-    uint16_t receivedLEDmode;
+void led_task(void *param) {
     const uint8_t ledSort[7] = {2, 1, 0, 6, 5, 4, 3};
     const uint16_t ledCount = 7;
     rgb_color colors[ledCount];
-    uint8_t brightness = 31;
-    uint8_t current_led = 0;
-    rgb_color greenColor = rgb_color(0, 255, 0);
-    rgb_color orangeColor = rgb_color(255, 165, 0);
-    rgb_color redColor = rgb_color(255, 0, 0);
+    uint8_t brightness = 30;
+    uint16_t temp;
+    int8_t last_led = 0;
+    EventBits_t bit;
 
     while (1) {
-        // if (xQueueReceive(led_setting_queue, &receivedLEDmode, portMAX_DELAY) == pdPASS) {
-        //     // Use receivedLEDmode to control the LED behavior
-        //     LEDmode = receivedLEDmode;
-        // }
-        memset(colors, 0, sizeof(colors));
+        if (xQueueReceive(led_setting_queue, &temp, 0)) {
+            LEDmode = (temp >> 6) & 0xF;
+            brightness = temp & 0x3F;
+
+            Serial.printf("temp : 0x%X\r\n", temp);
+            Serial.printf("LEDmode : 0x%X\r\n", LEDmode);
+            Serial.printf("brightness : 0x%X\r\n", brightness);
+        }
 
         switch (LEDmode) {
-            case 1: // LED off
-                // LEDs stay off
-                break;
-            case 2: // Green LEDs sequential
-                colors[current_led] = greenColor;
-                break;
-            case 3: // All green LEDs on
+            case 0:
+                // LEDs off
                 for (uint16_t i = 0; i < ledCount; i++) {
-                    colors[i] = greenColor;
+                    colors[i] = rgb_color(0, 0, 0);
+                }
+                ledStrip.write(colors, ledCount, brightness);
+                break;
+            case 1:
+                // LEDs solid green
+                for (uint16_t i = 0; i < ledCount; i++) {
+                    colors[i] = rgb_color(0, 255, 0); // Green color
+                }
+                ledStrip.write(colors, ledCount, brightness);
+                break;
+            case 2:
+                // LEDs solid orange
+                for (uint16_t i = 0; i < ledCount; i++) {
+                    colors[i] = rgb_color(255, 165, 0); // Orange color
+                }
+                ledStrip.write(colors, ledCount, brightness);
+                break;
+            case 3:
+                // LEDs solid red
+                for (uint16_t i = 0; i < ledCount; i++) {
+                    colors[i] = rgb_color(255, 0, 0); // Red color
+                }
+                ledStrip.write(colors, ledCount, brightness);
+                break;
+            case 4:
+                // LEDs green sequentially
+                for (uint16_t i = 0; i < ledCount; i++) {
+                    colors[ledSort[i]] = rgb_color(0, 255, 0); // set current led green
+                    ledStrip.write(colors, ledCount, brightness);
+                    colors[ledSort[i]] = rgb_color(0, 0, 0);
+                    delay(100);
                 }
                 break;
-            case 4: // All orange LEDs on
-                for (uint16_t i = 0; i < ledCount; i++) {
-                    colors[i] = orangeColor;
-                }
-                break;
-            case 5: // All red LEDs on
-                for (uint16_t i = 0; i < ledCount; i++) {
-                    colors[i] = redColor;
-                }
-                break;
-            default: // Default to LED off
+            default:
                 break;
         }
 
-        ledStrip.write(colors, ledCount, brightness);
-
-        current_led = (current_led + 1) % ledCount; // Move to the next LED
-
-        delay(100); // Delay to control the speed
+        delay(10);
     }
 }
+
 
 rgb_color hsvToRgb(uint16_t h, uint8_t s, uint8_t v)
 {
@@ -807,5 +825,6 @@ rgb_color hsvToRgb(uint16_t h, uint8_t s, uint8_t v)
     }
     return rgb_color(r, g, b);
 }
+
 
 
