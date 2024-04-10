@@ -6,6 +6,13 @@
 		{
 			"name": "OTR_T-embed",
 			"path": "."
+		},
+		{
+			"path": "../../../../../PlatformIO/T-Embed-main/examples"
+		},
+		{
+			"name": "Blink",
+			"path": "../../../../../PlatformIO/Blink"
 		}
 	],
 	"settings": {}
