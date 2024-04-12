@@ -14,7 +14,9 @@
 #include "APA102.h" 
 #include <OneButton.h> 
 #include <RotaryEncoder.h>
-
+#include "ESPAsyncWebServer.h"
+#include <AsyncTCP.h>
+#include <ArduinoJson.h>
 
 TFT_eSPI tft = TFT_eSPI();
 Audio *audio;
@@ -24,6 +26,8 @@ OneButton button(PIN_ENCODE_BTN, true);
 APA102<PIN_APA102_DI, PIN_APA102_CLK> ledStrip;
 EventGroupHandle_t global_event_group;
 QueueHandle_t led_setting_queue;
+AsyncWebServer server(80);
+
 
 void SD_init(void);
 void splash_screen(void);
@@ -51,6 +55,15 @@ int isTagInTagsList(const char* RFID);
 void displaySuccessfulScan(int& row);
 void led_task(void *param);
 rgb_color hsvToRgb(uint16_t h, uint8_t s, uint8_t v);
+void add_scan_to_list(const char* path, const char* filename, const char* record);
+void button_pressed();
+void createExampleFile();
+void handleRoot(AsyncWebServerRequest *request);
+void handleValues(AsyncWebServerRequest *request);
+
+
+
+
 
 #define RXD1 16
 #define TXD1 17
@@ -66,7 +79,14 @@ byte hour;
 byte minute;
 byte second;
 
-char RFID[17];
+char RFID[17] = "no data";
+String NLISID = "no data";
+String VisualID = "no data";
+String currentStatus = "no data";
+String NAME = "no data";
+String GROUP = "no data";
+String LOCATION = "no data";
+String COLOUR = "no data";
 char **tagRFID;
 char **tempRFID;
 char **tagVisual_ID;
@@ -90,6 +110,7 @@ uint16_t numActiveTags;
 uint16_t LEDmode = 0;
 uint16_t newLEDmode = 0;
 uint16_t brightness = 30;
+bool scanProcessed = false;
 
 typedef struct {
   uint8_t cmd;
@@ -164,13 +185,18 @@ void setup()
     return;
   }
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-  
+
+Serial.print("Connecting to WiFi ");  
 WiFi.begin(WIFI_SSID,WIFI_PASSWORD);
 while (WiFi.status() != WL_CONNECTED)   {
     delay(500);
     Serial.print(".");
 }
 Serial.println("\nWifi connected.");
+Serial.print("IP address: ");
+Serial.println(WiFi.localIP());
+
+
 
 configTime(GMT_OFFSET_SEC, DAY_LIGHT_OFFSET_SEC, NTP_SERVER1, NTP_SERVER2);
 struct tm timeinfo;
@@ -193,6 +219,28 @@ led_setting_queue = xQueueCreate(5, sizeof(uint16_t));
 
 xTaskCreatePinnedToCore(led_task, "led_task", 1024 * 2, led_setting_queue, 0, NULL, 0);
 
+button.attachClick(button_pressed);
+
+
+// section for web server
+server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    handleRoot(request);
+});
+server.on("/values", HTTP_GET, [](AsyncWebServerRequest *request) {
+    handleValues(request);
+});
+server.serveStatic("/html", LittleFS, "/");
+// Route to serve Black.png
+server.on("/Black.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/html/BLACK.png", "image/png");
+});
+server.on("/textfile", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/html/test2.txt", "text/plain");  // Serve the example.txt file as text/plain content type
+});
+server.begin();
+Serial.println("Server started");
+
+
 splash_screen();
 
 
@@ -204,13 +252,16 @@ read_tags_file();
 //add_tags_from_file();
 //printFileContents("/test_bucket2.csv");
 
-LEDmode = 4;
+LEDmode = 0;
+//createExampleFile();
 
 }
 
 void loop()
 {
     audio->loop();
+    button.tick();
+    
     if (Serial.available()) {
         String teststr = Serial.readString();  //read until timeout
         teststr.trim();
@@ -247,6 +298,14 @@ void loop()
             } else {
                 Serial.println("Active");
                 displaySuccessfulScan(row);
+                NLISID = String(tagNLISID[row]);
+                VisualID = String(tagVisual_ID[row]);
+                currentStatus = String(tagStatuses[tagStatusVal[row]]);
+                Serial.println(currentStatus);
+                NAME = String(tagName[row]);
+                GROUP = String(groups[tagGroup[row]]);
+                LOCATION = String(locations[tagLocation[row]]);
+                COLOUR = String(tagColour[row]);
                 audio->connecttoFS(LittleFS, "/sounds/scangood.mp3");
                 LEDmode = 1;
                 newLEDmode = (LEDmode << 6) | (brightness & 0x3F);
@@ -470,12 +529,12 @@ void read_tag_status_list()   {
         numStatuses++;
     }
 
-    Serial.print("No. Statuses: ");
-    Serial.println(numStatuses);
+    // Serial.print("No. Statuses: ");
+    // Serial.println(numStatuses);
 
-    for(int i = 0; i < numStatuses; i++)  {
-        Serial.println(tagStatuses[i]);
-    }
+    // for(int i = 0; i < numStatuses; i++)  {
+    //     Serial.println(tagStatuses[i]);
+    // }
 
     tagStatusFile.close();
     
@@ -498,12 +557,12 @@ void read_tag_group_list()   {
         numGroups++;
     }
 
-    Serial.print("No. Groups: ");
-    Serial.println(numGroups);
+    // Serial.print("No. Groups: ");
+    // Serial.println(numGroups);
 
-    for(int i = 0; i < numGroups; i++)  {
-        Serial.println(groups[i]);
-    }
+    // for(int i = 0; i < numGroups; i++)  {
+    //     Serial.println(groups[i]);
+    // }
 
     tagGroupFile.close();
 }
@@ -525,12 +584,12 @@ void read_tag_location_list()   {
         numLocations++;
     }
 
-    Serial.print("No. Locations: ");
-    Serial.println(numLocations);
+    // Serial.print("No. Locations: ");
+    // Serial.println(numLocations);
 
-    for(int i = 0; i < numLocations; i++)  {
-        Serial.println(locations[i]);
-    }
+    // for(int i = 0; i < numLocations; i++)  {
+    //     Serial.println(locations[i]);
+    // }
 
     tagLocationFile.close();
 }
@@ -686,9 +745,9 @@ int isTagInTagsList(const char* RFID) {
     Serial.println("isInTagsList: ");
     for (int row = 0; row < numTags; row++) {
         if (strcmp(tagRFID[row], RFID) == 0) {
-            Serial.print("Row ");
-            Serial.println(row);
-            Serial.println(tagRFID[row]);
+            // Serial.print("Row ");
+            // Serial.println(row);
+            // Serial.println(tagRFID[row]);
             return row; // Return the row if tag is found
         }
     }
@@ -741,7 +800,6 @@ void displaySuccessfulScan(int& row) {
         Serial.println(tagNLISID[row]);   
 }
 
-
 void led_task(void *param) {
     const uint8_t ledSort[7] = {2, 1, 0, 6, 5, 4, 3};
     const uint16_t ledCount = 7;
@@ -756,9 +814,9 @@ void led_task(void *param) {
             LEDmode = (temp >> 6) & 0xF;
             brightness = temp & 0x3F;
 
-            Serial.printf("temp : 0x%X\r\n", temp);
-            Serial.printf("LEDmode : 0x%X\r\n", LEDmode);
-            Serial.printf("brightness : 0x%X\r\n", brightness);
+            // Serial.printf("temp : 0x%X\r\n", temp);
+            // Serial.printf("LEDmode : 0x%X\r\n", LEDmode);
+            // Serial.printf("brightness : 0x%X\r\n", brightness);
         }
 
         switch (LEDmode) {
@@ -807,7 +865,6 @@ void led_task(void *param) {
     }
 }
 
-
 rgb_color hsvToRgb(uint16_t h, uint8_t s, uint8_t v)
 {
     uint8_t f = (h % 60) * 255 / 60;
@@ -825,6 +882,108 @@ rgb_color hsvToRgb(uint16_t h, uint8_t s, uint8_t v)
     }
     return rgb_color(r, g, b);
 }
+
+void add_scan_to_list(const char* path, const char* filename, const char* record) {
+    String filepath = String(path) + "/" + String(filename);
+    File listFile = LittleFS.open(filepath.c_str(), "a"); // Open the file in append mode
+
+    if (!listFile) {
+        Serial.println("Failed to open " + filepath + " for writing");
+        return;
+    }
+
+    listFile.println(record); // Append the new record to the file
+    listFile.close(); // Close the file
+}
+
+String create_new_list() {
+    DateTime now = rtc.now();
+
+    String baseName = "-scans.csv";
+    String currentDate = String(now.year()) + "-" + String(now.month()) + "-" + String(now.day());
+    String fileName = "/" + currentDate + baseName;
+    int counter = 1;
+
+    while (LittleFS.exists(fileName.c_str())) {
+        fileName = "/" + currentDate + baseName.substring(0, baseName.indexOf('.')) + "-" + String(counter) + ".csv";
+        counter++;
+    }
+
+    File file = LittleFS.open(fileName.c_str(), "w");
+    if (file) {
+        // Add content to the file if needed
+        file.close();
+    }
+    
+    return fileName;
+}
+
+void button_pressed() { 
+    Serial.println("Button pressed - Enter Scan Mode!");
+    LEDmode = 4;
+    newLEDmode = (LEDmode << 6) | (brightness & 0x3F);
+    xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
+}
+
+
+
+void createExampleFile() {
+  File file = SD_MMC.open("/example.txt", FILE_WRITE);
+  if (file) {
+    file.println("This is an example file.");
+    file.println("You can add any content you want here.");
+    file.close();
+    Serial.println("Example file created.");
+  } else {
+    Serial.println("Failed to create example file.");
+  }
+}
+
+void handleRoot(AsyncWebServerRequest *request) {
+  File file = LittleFS.open("/index.html", "r");
+  if (!file) {
+    request->send(404);
+    return;
+  }
+
+  size_t size = file.size();
+  char* buf = new char[size + 1];
+  file.readBytes(buf, size);
+  file.close();
+  buf[size] = '\0'; // Null-terminate the buffer
+
+  // Replace placeholders with actual values
+  String htmlContent = String(buf);
+
+
+  request->send(200, "text/html", htmlContent);
+  delete[] buf;
+}
+
+void handleValues(AsyncWebServerRequest *request) {
+  StaticJsonDocument<200> jsonDoc;
+  jsonDoc["RFID"] = RFID;
+  jsonDoc["NLISID"] = NLISID;
+  jsonDoc["VisualID"] = VisualID;
+  jsonDoc["Status"] = currentStatus;
+  jsonDoc["Name"] = NAME;
+  jsonDoc["Group"] = GROUP;
+  jsonDoc["Location"] = LOCATION;
+  jsonDoc["Colour"] = COLOUR;
+
+  String response;
+  serializeJson(jsonDoc, response);
+
+  request->send(200, "application/json", response);
+}
+
+
+
+
+
+
+
+
 
 
 
