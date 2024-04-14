@@ -11,55 +11,114 @@
             text-align: center;
             font-weight: bold;
         }
+        .tag-container {
+            position: relative;
+            width: 310px; /* set the width to 310 pixels */
+            background-color: rgba(204, 204, 204, 0); /* grey background for the container */
+            margin: 20px auto; /* center the container */
+            padding: 20px; /* add some padding */
+            z-index: 1;
+        }
+        .tag-image {
+            width: 310px; /* set the width to 310 pixels */
+            height: 46px; /* set the height to 46 pixels */
+        }
+        .nlis-overlay {
+            position: absolute;
+            top: 27px; /* adjust top position */
+            left: 145px; /* adjust left position */
+            width: 20px; /* set the width to 20 pixels */
+            height: 28px; /* set the height to 28 pixels */
+        }
+        .tag-text {
+            position: absolute;
+            color: white;   /* text is white for purple, black, grey and brown */
+            font-family: Arial, sans-serif; /* set font to Arial */
+            font-weight: bold; /* make the text bold */
+        }
+        .PIC {
+            top: 29px;
+            left: 50px;
+            font-size: 14px; /* set the font size to 14 pixels */
+        }
+        .NLIScode {
+            bottom: 30px;
+            left: 50px;
+            font-size: 14px; /* set the font size to 14 pixels */
+        }
+        .VisualID {
+            bottom: 32px;
+            right: 55px;
+            font-size: 26px; /* set the font size to 24 pixels */
+            font-family: "Arial Narrow", sans-serif;
+            font-weight: bold;
+            transform: scaleX(0.75);
+        }
+        .panel {
+            background-color: lightgrey;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+            width: 350px;
+            margin: 0 auto;
+        }
 
-        span.unused {
+        .unused {
             color: red !important;
             font-weight: bold;
-            
         }
     </style>
 </head>
 <body>
-    <h2>Scan Data</h2>
-    <p>RFID: <span id='rfid'>Loading...</span></p>
-    <p>NLIS ID: <span id='nlisID'>Loading...</span></p>
-    <p>Visual ID: <span id='visualID'>Loading...</span></p>
-    <p>Status: <span id='status'>Loading...</span></p>
-    <p>Name: <span id='name'>Loading...</span></p>
-    <p>Group: <span id='group'>Loading...</span></p>
-    <p>Location: <span id='location'>Loading...</span></p>
-    <p>Colour: <span id='colour'>Loading...</span></p>
-    <img src="/Black.png" alt="Black Tag">
-   
+    <div class="panel">
+        <h2>Scan Data</h2>
+        <p>RFID: <span id='rfid'>Loading...</span></p>
+        <p>NLIS ID: <span id='nlisID'>Loading...</span></p>
+        <p>Visual ID: <span id='visualID'>Loading...</span></p>
+        <p>Status: <span id='status'>Loading...</span></p>
+        <p>Name: <span id='name'>Loading...</span></p>
+        <p>Group: <span id='group'>Loading...</span></p>
+        <p>Location: <span id='location'>Loading...</span></p>
+        <p>Colour: <span id='colour'>Loading...</span></p>
+        <div class="tag-container">
+            <img src="/Black.png" alt="Black Tag" class="tag-image">
+            <img src="nlis_white.png" alt="Overlay" class="tag-image nlis-overlay">
+            <div class="tag-text PIC">NO DATA</div>
+            <div class="tag-text NLIScode">NO DATA</div>
+            <div class="tag-text VisualID">NO DATA</div>
+        </div>
+    </div>
     
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        function updateValues() {
-            fetch('/values')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('rfid').innerText = data.RFID;
-                    document.getElementById('nlisID').innerText = data.NLISID;
-                    document.getElementById('visualID').innerText = data.VisualID;
-                    document.getElementById('status').innerText = data.Status;
-                    document.getElementById('name').innerText = data.Name;
-                    document.getElementById('group').innerText = data.Group;
-                    document.getElementById('location').innerText = data.Location;
-                    document.getElementById('colour').innerText = data.Colour;
+        document.addEventListener('DOMContentLoaded', function() {
+            function updateValues() {
+                fetch('/values')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('rfid').innerText = data.RFID;
+                        document.getElementById('nlisID').innerText = data.NLISID;
+                        document.getElementById('visualID').innerText = data.VisualID;
+                        document.getElementById('status').innerText = data.Status;
+                        document.getElementById('name').innerText = data.Name;
+                        document.getElementById('group').innerText = data.Group;
+                        document.getElementById('location').innerText = data.Location;
+                        document.getElementById('colour').innerText = data.Colour;
+                        document.querySelector('.tag-text.VisualID').innerText = data.VisualID;
+                        document.querySelector('.tag-text.PIC').innerText = data.NLISID.slice(0,8);
+                        document.querySelector('.tag-text.NLIScode').innerText = data.NLISID.slice(-8);
 
-                    // Check if Status is UNUSED and apply red color and bold font-weight
-                    if (data.Status.includes("UNUSED")) {
-                        console.log("Status is UNUSED");
-                        document.getElementById('status').classList.add('unused');
-                    } else {
-                        console.log("Status is not UNUSED");
-                        document.getElementById('status').classList.remove('unused');
-                    }
-                });
-        }
+                        if (data.Status.includes("UNUSED")) {
+                            console.log("Status is UNUSED");
+                            document.getElementById('status').classList.add('unused');
+                        } else {
+                            console.log("Status is not UNUSED");
+                            document.getElementById('status').classList.remove('unused');
+                        }
+                    });
+            }
 
-        setInterval(updateValues, 5000); // Update values every 5 seconds
-      });
+            setInterval(updateValues, 5000); // Update values every 5 seconds
+        });
     </script>
 </body>
 </html>

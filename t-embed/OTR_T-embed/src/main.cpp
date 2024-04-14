@@ -79,14 +79,14 @@ byte hour;
 byte minute;
 byte second;
 
-char RFID[17] = "no data";
-String NLISID = "no data";
-String VisualID = "no data";
-String currentStatus = "no data";
-String NAME = "no data";
-String GROUP = "no data";
-String LOCATION = "no data";
-String COLOUR = "no data";
+char RFID[17] = "No Data";
+String NLISID = "No Data";
+String VisualID = "No Data";
+String currentStatus = "No Data";
+String NAME = "No Data";
+String GROUP = "No Data";
+String LOCATION = "No Data";
+String COLOUR = "No Data";
 char **tagRFID;
 char **tempRFID;
 char **tagVisual_ID;
@@ -179,10 +179,9 @@ void setup()
   }
  
   Wire.begin(PIN_IIC_SDA, PIN_IIC_SCL);  //initialise RTC
-  rtc.begin();
   if (!rtc.begin())     {
     Serial.println("Couldn't find RTC");
-    return;
+    // return;
   }
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
@@ -233,6 +232,9 @@ server.serveStatic("/html", LittleFS, "/");
 // Route to serve Black.png
 server.on("/Black.png", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/html/BLACK.png", "image/png");
+});
+server.on("/nlis_white.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/html/nlis_white.png", "image/png");
 });
 server.on("/textfile", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/html/test2.txt", "text/plain");  // Serve the example.txt file as text/plain content type
