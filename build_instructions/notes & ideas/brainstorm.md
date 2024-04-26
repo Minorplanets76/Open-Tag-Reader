@@ -2,7 +2,7 @@
 ### Critical Functionality
 Scan a tag and add to a list of scanned tags with date/time scanned.
 
-Beep when successful.
+Beep when successful. Done
 
 Store the scanned list as a file that can be copied off the device.
 

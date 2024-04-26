@@ -17,10 +17,13 @@
 #include "ESPAsyncWebServer.h"
 #include <AsyncTCP.h>
 #include <ArduinoJson.h>
+#include "otrScanning.h"
+#include "otrTime.h"
 
 TFT_eSPI tft = TFT_eSPI();
 Audio *audio;
 RTC_DS3231 rtc;
+
 RotaryEncoder encoder(PIN_ENCODE_A, PIN_ENCODE_B, RotaryEncoder::LatchMode::TWO03);
 OneButton button(PIN_ENCODE_BTN, true);
 APA102<PIN_APA102_DI, PIN_APA102_CLK> ledStrip;
@@ -39,10 +42,9 @@ void read_active_tags_file(void);
 void read_tag_status_list(void);
 void read_bucket_file(int(bucketRows),String(buckRFID),String(buckNLISID), String(buckVisualID), 
                       String(buckIssueDate),String(buckColour), int bucketTags);
-void set_RTC(byte& year, byte& month, byte& date, byte& dOW,
-                  byte& hour, byte& minute, byte& second);
-void printLocalTime(void);
-bool validateRFID(const char* inputString);
+
+
+
 bool isTagActive(const char* inputString, int& row);
 void read_bucket_file(void);
 void add_tags_from_file(void);
@@ -50,7 +52,7 @@ void copyFileFromLittleFStoSD(const char* sourcePath, const char* destinationDir
 void appendNewLine(const char* filePath, char** bucketRow);
 void moveFileFromLittleFStoSD(const char* sourcePath, const char* destinationDirectory, const char* destinationFilename);
 void printFileContents(const char* filePath);
-String findDogName(const char* RFID);
+
 int isTagInTagsList(const char* RFID);
 void displaySuccessfulScan(int& row);
 void led_task(void *param);
@@ -70,14 +72,7 @@ void handleValues(AsyncWebServerRequest *request);
 
 
 
-bool pmFlag;
-byte year;
-byte month;
-byte date;
-byte dOW;
-byte hour;
-byte minute;
-byte second;
+
 
 char RFID[17] = "No Data";
 String NLISID = "No Data";
@@ -140,13 +135,12 @@ lcd_cmd_t lcd_st7789v[] = {
 
 void setup()
 {
-  pinMode(PIN_POWER_ON, OUTPUT);
-  digitalWrite(PIN_POWER_ON, HIGH);
-  Serial.begin(115200);
-  Serial1.begin(9600, SERIAL_8N1, RXD1, TXD1);
-  Serial1.setTimeout(100);
+    pinMode(PIN_POWER_ON, OUTPUT);
+    digitalWrite(PIN_POWER_ON, HIGH);
+    serial1Initialize();
+    rtc_init();
 
-  tft.begin();
+    tft.begin();
   // Update Embed initialization parameters
   for (uint8_t i = 0; i < (sizeof(lcd_st7789v) / sizeof(lcd_cmd_t)); i++) {
     tft.writecommand(lcd_st7789v[i].cmd);
@@ -178,12 +172,6 @@ void setup()
     Serial.println("Start.mp3 not found"); while (1)delay(1000);
   }
  
-  Wire.begin(PIN_IIC_SDA, PIN_IIC_SCL);  //initialise RTC
-  if (!rtc.begin())     {
-    Serial.println("Couldn't find RTC");
-    // return;
-  }
-  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
 Serial.print("Connecting to WiFi ");  
 WiFi.begin(WIFI_SSID,WIFI_PASSWORD);
@@ -197,15 +185,8 @@ Serial.println(WiFi.localIP());
 
 
 
-configTime(GMT_OFFSET_SEC, DAY_LIGHT_OFFSET_SEC, NTP_SERVER1, NTP_SERVER2);
-struct tm timeinfo;
-if (!getLocalTime(&timeinfo))   {
-    Serial.println("Failed to obtain time");
-    return;
-}
-rtc.adjust(DateTime(timeinfo.tm_year+1900,timeinfo.tm_mon+1,timeinfo.tm_mday,
-                    timeinfo.tm_hour, timeinfo.tm_min,timeinfo.tm_sec));
-printLocalTime();
+
+print_local_time();
 
 delay(1000);
 Serial.printf("LittleFS totalBytes : %d kb\r\n", LittleFS.totalBytes() / 1024);
@@ -332,24 +313,11 @@ void splash_screen(void) {  //Screen with memory parameters
     tft.printf(" LittleFS used: %d kb\r\n", LittleFS.usedBytes() / 1024);
     // Display the temperature
 	tft.printf(" Temperature: %.1f `C\r\n", rtc.getTemperature());
-    //Dsiplay RTC time and date
-    DateTime now = rtc.now();
-    if (now.isPM()) {
-        tft.printf(" RTC Time: %02d:%02d:%02d PM\r\n", now.hour()-12, now.minute(), now.second());
-    } else{
-        tft.printf(" RTC Time: %02d:%02d:%02d AM\r\n", now.hour(), now.minute(), now.second());
-    }
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo))   {
-        Serial.println("Failed to obtain time");
-        return;
-    }
-    tft.printf(" NTP Time: %02d:%02d:%02d\r\n", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
-    tft.printf(" RTC Date: %d/%d/%d \r\n", now.day(),now.month(),now.year());
+
 
     float volt = (analogRead(PIN_BAT_VOLT) * 2 * 3.3 ) / 4095;
     tft.printf(" Battery voltage: %.2f V\r\n", volt);
-    Serial.printf("Current Date: %02d/%02d/%04d\r\n", timeinfo.tm_mday, timeinfo.tm_mon+1, timeinfo.tm_year+1900);
+
   }
 
 void SD_init(void)
@@ -382,14 +350,7 @@ void SD_init(void)
     delay(500);
 }
 
-void printLocalTime()   {
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo))   {
-        Serial.println("Failed to obtain time");
-        return;
-    }
-    Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-}
+
 
 void read_bucket_file(int row, char** bucketRow, int& bucketTags) {
     // Reads in a bucket file (Shearwell)
@@ -596,37 +557,6 @@ void read_tag_location_list()   {
     tagLocationFile.close();
 }
 
-bool validateRFID(const char* RFID)    {
-    if (strlen(RFID) != 16) {
-        //not a dog by any chance?
-        Serial.println("RFID is not 16 characters long");
-        Serial.print("Length: ");
-        Serial.println(strlen(RFID));
-        audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
-        tft.fillScreen(TFT_RED);
-        tft.setTextColor(TFT_BLACK);
-        tft.drawCentreString("INVALID", LV_SCREEN_HEIGHT/2, 55,4);
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        return false;
-    }
-    if (strncmp(RFID, "940", 3) != 0) {
-        // it might be a dog
-        if(findDogName(RFID) == "NOT FOUND") {
-            
-        }
-        Serial.println("RFID does not start with 940");
-        Serial.print("It's not a known dog, but starts with: ");
-        Serial.println(strncmp(RFID, "940", 3));
-        audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
-        tft.fillScreen(TFT_RED);
-        tft.setTextColor(TFT_BLACK);
-        tft.drawCentreString("INVALID", LV_SCREEN_HEIGHT/2, 55,4);
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        return false;
-    }
-    return true;
-}
-
 bool isTagActive(const char* RFID, int& row) {
     row = isTagInTagsList(RFID);
     if(row != -1)  {
@@ -755,33 +685,6 @@ int isTagInTagsList(const char* RFID) {
     }
 
     return -1; // Return -1 if tag is not found in the array
-}
-
-String findDogName(const char* RFID) {
-    File file = LittleFS.open("dogs.csv", FILE_READ);
-    String dogName = ""; // Initialize the dog name variable
-
-    if (file) {
-        while (file.available()) {
-            String line = file.readStringUntil('\n');
-            if (line.startsWith(RFID)) {
-                // Extract the dog name from the CSV line
-                int commaIndex = line.indexOf(',');
-                if (commaIndex != -1) {
-                    dogName = line.substring(commaIndex + 1);
-                    break; // Exit the loop once the RFID match is found
-                }
-            }
-        }
-        file.close();
-        if (dogName == "") {
-            dogName = "NOT FOUND";
-        }
-    } else {
-        Serial.println("Error opening dogs.csv");
-    }
-
-    return dogName;
 }
 
 void displaySuccessfulScan(int& row) {

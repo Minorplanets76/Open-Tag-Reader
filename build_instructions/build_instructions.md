@@ -23,7 +23,7 @@ Right angle header|1|  |
 
 
 ## Attach antenna
-1. Seat antenna in grove aligning pigtails with the slots.
+1. Seat antenna in groove aligning pigtails with the slots.
 2. Feed under and through board at A+ and A-
 3. Check wires seated and fix in place.
 4. Solder antenna to board.
@@ -41,4 +41,4 @@ Right angle header|1|  |
 The battery is a different JST connector to the T-Embed Board.  A boost converter is required for the reader board. A female JST PH2.0 socket and tail is recommended so the battery can be disconnected, but the connector on the battery can be cut off and the battery soldered directly.
 1. Solder the Battery and Board pigtails to the Boost Converter board V*in* pads
 2. Solder headers to V*out* pads
-3. Make connecting cable with Dupont connectors either side.
+3. Make connecting cable with JST connectors either side.

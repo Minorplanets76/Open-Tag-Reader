@@ -9,10 +9,7 @@
 
 #define WIFI_CONNECT_WAIT_MAX (30 * 1000)
 
-#define NTP_SERVER1           "au.pool.ntp.org"
-#define NTP_SERVER2           "pool.ntp.org"
-#define GMT_OFFSET_SEC        (3600 * 10)
-#define DAY_LIGHT_OFFSET_SEC  3600
+
 
 #define LV_SCREEN_WIDTH       320
 #define LV_SCREEN_HEIGHT      170
@@ -20,8 +17,7 @@
 /*ESP32S3*/
 #define PIN_POWER_ON          46
 
-#define PIN_IIC_SDA           18
-#define PIN_IIC_SCL           8
+
 
 #define PIN_APA102_CLK        45
 #define PIN_APA102_DI         42
