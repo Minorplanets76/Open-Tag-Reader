@@ -1,7 +1,7 @@
 #include "otrTime.h"
-#include <Arduino.h>
 
-RTC_DS3231 rtc;
+
+extern RTC_DS3231 rtc;
 void rtc_init() {
   
   Wire.begin(PIN_IIC_SDA, PIN_IIC_SCL);  //initialise RTC

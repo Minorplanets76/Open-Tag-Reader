@@ -3,7 +3,7 @@
 #define CREDENTIALS_H
 // Update these credentials
 
-#define WIFI_SSID             "Your-SSID"
-#define WIFI_PASSWORD         "Your-password"
+#define WIFI_SSID             "DADSFFICEPC"
+#define WIFI_PASSWORD         "Demelza73"
 
 #endif

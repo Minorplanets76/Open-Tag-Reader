@@ -1,7 +1,5 @@
 #include "otrScanning.h"
-#include <Arduino.h>
-#include "FS.h"
-#include "LittleFS.h"
+
 
 void serial1Initialize(void) {
     Serial.begin(115200);
@@ -15,7 +13,7 @@ bool validateRFID(const char* RFID)    {
         Serial.println("RFID is not 16 characters long");
         Serial.print("Length: ");
         Serial.println(strlen(RFID));
-        //audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
+        playScanBad();
         // tft.fillScreen(TFT_RED);
         // tft.setTextColor(TFT_BLACK);
         // tft.drawCentreString("INVALID", LV_SCREEN_HEIGHT/2, 55,4);
@@ -32,9 +30,7 @@ bool validateRFID(const char* RFID)    {
             Serial.print("Dog name: ");
             Serial.println(dogName);
         }
-
-
-        // audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
+        playScanGood();
         // tft.fillScreen(TFT_RED);
         // tft.setTextColor(TFT_BLACK);
         // tft.drawCentreString("INVALID", LV_SCREEN_HEIGHT/2, 55,4);

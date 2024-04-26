@@ -17,13 +17,16 @@
 #include "ESPAsyncWebServer.h"
 #include <AsyncTCP.h>
 #include <ArduinoJson.h>
-#include "otrScanning.h"
 #include "otrTime.h"
+#include "credentials.h"
+#include "otrFileHandling.h"
+#include "otrFeedback.h"
+#include "otrScanning.h"
 
 TFT_eSPI tft = TFT_eSPI();
-Audio *audio;
-RTC_DS3231 rtc;
 
+RTC_DS3231 rtc;
+Audio *audio;
 RotaryEncoder encoder(PIN_ENCODE_A, PIN_ENCODE_B, RotaryEncoder::LatchMode::TWO03);
 OneButton button(PIN_ENCODE_BTN, true);
 APA102<PIN_APA102_DI, PIN_APA102_CLK> ledStrip;
@@ -32,7 +35,7 @@ QueueHandle_t led_setting_queue;
 AsyncWebServer server(80);
 
 
-void SD_init(void);
+
 void splash_screen(void);
 void read_bucket_file(void);
 bool read_tags_file(void);
@@ -48,18 +51,14 @@ void read_bucket_file(int(bucketRows),String(buckRFID),String(buckNLISID), Strin
 bool isTagActive(const char* inputString, int& row);
 void read_bucket_file(void);
 void add_tags_from_file(void);
-void copyFileFromLittleFStoSD(const char* sourcePath, const char* destinationDirectory, const char* destinationFilename);
-void appendNewLine(const char* filePath, char** bucketRow);
-void moveFileFromLittleFStoSD(const char* sourcePath, const char* destinationDirectory, const char* destinationFilename);
-void printFileContents(const char* filePath);
+
 
 int isTagInTagsList(const char* RFID);
 void displaySuccessfulScan(int& row);
-void led_task(void *param);
-rgb_color hsvToRgb(uint16_t h, uint8_t s, uint8_t v);
+
 void add_scan_to_list(const char* path, const char* filename, const char* record);
-void button_pressed();
-void createExampleFile();
+
+
 void handleRoot(AsyncWebServerRequest *request);
 void handleValues(AsyncWebServerRequest *request);
 
@@ -67,12 +66,14 @@ void handleValues(AsyncWebServerRequest *request);
 
 
 
-#define RXD1 16
-#define TXD1 17
 
-
-
-
+bool pmFlag;
+int year;
+int month;
+int date;
+int hour;
+int minute;
+int second;
 
 char RFID[17] = "No Data";
 String NLISID = "No Data";
@@ -102,9 +103,7 @@ uint8_t *tagGroup;
 uint8_t *tagLocation;
 uint16_t numTags;
 uint16_t numActiveTags;
-uint16_t LEDmode = 0;
-uint16_t newLEDmode = 0;
-uint16_t brightness = 30;
+
 bool scanProcessed = false;
 
 typedef struct {
@@ -160,17 +159,10 @@ void setup()
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawString("Open Tag Reader", 60, 75, 4);
 
-  if(!LittleFS.begin()){
-    Serial.println("An Error has occurred while mounting LittleFS"); delay(1000);
-    return;
-  }
-
-  audio = new Audio(0, 3, 1);
-  audio->setPinout(PIN_IIS_BCLK, PIN_IIS_WCLK, PIN_IIS_DOUT);
-  audio->setVolume(21); // 0...21
-  if (!audio->connecttoFS(LittleFS, "/sounds/start.mp3")) {
-    Serial.println("Start.mp3 not found"); while (1)delay(1000);
-  }
+  initFileSystem();
+  initAudio();
+  initLED();
+  initButton();
  
 
 Serial.print("Connecting to WiFi ");  
@@ -195,11 +187,8 @@ tft.setRotation(2);
 tft.fillScreen(TFT_BLACK);
 SD_init();
 
-led_setting_queue = xQueueCreate(5, sizeof(uint16_t));
 
-xTaskCreatePinnedToCore(led_task, "led_task", 1024 * 2, led_setting_queue, 0, NULL, 0);
 
-button.attachClick(button_pressed);
 
 
 // section for web server
@@ -235,7 +224,7 @@ read_tags_file();
 //add_tags_from_file();
 //printFileContents("/test_bucket2.csv");
 
-LEDmode = 0;
+
 //createExampleFile();
 
 }
@@ -248,7 +237,7 @@ void loop()
     if (Serial.available()) {
         String teststr = Serial.readString();  //read until timeout
         teststr.trim();
-        audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
+        playScanBad();
         tft.fillScreen(TFT_BLACK);
         tft.drawString(teststr, 10, 10, 4);
         Serial.println(teststr);
@@ -265,19 +254,14 @@ void loop()
         bool isActiveTag = false;
         if(!validateRFID(RFID))   {
             Serial.println("Failed validation check");
-                LEDmode = 3;
-                newLEDmode = (LEDmode << 6) | (brightness & 0x3F);
-                xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
-            
+            changeLEDmode(3); // LEDs solid red
         } else{
             int row = 0;
             if(!isTagActive(RFID,row))    {
                 Serial.println("Not active");
-                audio->connecttoFS(LittleFS, "/sounds/scanbad.mp3");
+                playScanBad();
                 Serial.println("Tag not found in active_tags.csv");
-                LEDmode = 2;
-                newLEDmode = (LEDmode << 6) | (brightness & 0x3F);
-                xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
+                changeLEDmode(2); // LEDs solid orange
             } else {
                 Serial.println("Active");
                 displaySuccessfulScan(row);
@@ -289,10 +273,8 @@ void loop()
                 GROUP = String(groups[tagGroup[row]]);
                 LOCATION = String(locations[tagLocation[row]]);
                 COLOUR = String(tagColour[row]);
-                audio->connecttoFS(LittleFS, "/sounds/scangood.mp3");
-                LEDmode = 1;
-                newLEDmode = (LEDmode << 6) | (brightness & 0x3F);
-                xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
+                playScanGood();
+                changeLEDmode(1); // LEDs solid green
             }
         }
     }
@@ -302,17 +284,10 @@ void splash_screen(void) {  //Screen with memory parameters
     tft.fillScreen(TFT_BLACK);
     tft.drawCentreString("OPEN TAG", LV_SCREEN_HEIGHT/2, 10, 4);
     tft.drawCentreString("READER",LV_SCREEN_HEIGHT/2,35,4);
-    uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
+    
     tft.setCursor(5,70,2);
-    tft.printf("SD Card Size: %lluMB\n", cardSize);
-    uint64_t cardUsed = SD_MMC.usedBytes() / (1024 * 1024);
-    tft.printf(" SD Card used: %lluMB\n", cardUsed);
-    tft.printf(" psram size: %d kb\r\n", ESP.getPsramSize() / 1024);
-    tft.printf(" FLASH size: %d kb\r\n", ESP.getFlashChipSize() / 1024);
-    tft.printf(" LittleFS total: %d kb\r\n", LittleFS.totalBytes() / 1024);
-    tft.printf(" LittleFS used: %d kb\r\n", LittleFS.usedBytes() / 1024);
     // Display the temperature
-	tft.printf(" Temperature: %.1f `C\r\n", rtc.getTemperature());
+	//tft.printf(" Temperature: %.1f `C\r\n", rtc.getTemperature());
 
 
     float volt = (analogRead(PIN_BAT_VOLT) * 2 * 3.3 ) / 4095;
@@ -320,35 +295,7 @@ void splash_screen(void) {  //Screen with memory parameters
 
   }
 
-void SD_init(void)
-{
-    pinMode(PIN_SD_CS, OUTPUT);
-    digitalWrite(PIN_SD_CS, 1);
-    SD_MMC.setPins(PIN_SD_SCK, PIN_SD_MOSI, PIN_SD_MISO);
-    if (!SD_MMC.begin("/sdcard", true)) {
-        Serial.println("Card Mount Failed");
-        return;
-    }
-    uint8_t cardType = SD_MMC.cardType();
 
-    if (cardType == CARD_NONE) {
-        Serial.println("No SD card attached");
-        return;
-    }
-    Serial.print("SD Card Type: ");
-    if (cardType == CARD_MMC) {
-        Serial.println("MMC");
-    } else if (cardType == CARD_SD) {
-        Serial.println("SDSC");
-    } else if (cardType == CARD_SDHC) {
-        Serial.println("SDHC");
-    } else {
-        Serial.println("UNKNOWN");
-    }
-    uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
-    Serial.printf("SD Card Size: %lluMB\n", cardSize);
-    delay(500);
-}
 
 
 
@@ -573,104 +520,12 @@ bool isTagActive(const char* RFID, int& row) {
     return false;
 }
 
-void copyFileFromLittleFStoSD(const char* sourcePath, const char* destinationDirectory, const char* destinationFilename) {
-    String destinationPath = String(destinationDirectory) + "/" + String(destinationFilename);
 
-    File sourceFile = LittleFS.open(sourcePath, "r");
-    if (!sourceFile) {
-        Serial.println("Failed to open source file.");
-        return;
-    }
 
-    if (!SD_MMC.exists(destinationDirectory)) {
-        SD_MMC.mkdir(destinationDirectory);
-    }
 
-    File destinationFile = SD_MMC.open(destinationPath.c_str(), "w");
-    if (!destinationFile) {
-        Serial.println("Failed to create destination file.");
-        sourceFile.close();
-        return;
-    }
 
-    while (sourceFile.available()) {
-        destinationFile.write(sourceFile.read());
-    }
 
-    sourceFile.close();
-    destinationFile.close();
-}
 
-void appendNewLine(const char* filePath, char** bucketRow) {
-    File file = LittleFS.open(filePath, "a");
-    if (!file) {
-    Serial.println("Failed to open file for appending.");
-    return;
-    }
-    file.print(bucketRow[0]);
-    file.print(",");
-    file.print(bucketRow[1]);
-    file.print(",");
-    file.print(bucketRow[2]);
-    file.print(",");
-    file.print(bucketRow[3]);
-    file.print(",");
-    file.print(bucketRow[4]);
-    file.print(",\"0\",\"0\",\"\",\"0\",\"0\""); // add placeholders for gender, status, name, group and location
-    file.println(); // Write the line with a newline character
-    file.close();
-}
-
-void moveFileFromLittleFStoSD(const char* sourcePath, const char* destinationDirectory, const char* destinationFilename) {
-    String destinationPath = String(destinationDirectory) + "/" + String(destinationFilename);
-
-    File sourceFile = LittleFS.open(sourcePath, "r");
-    if (!sourceFile) {
-        Serial.println("Failed to open source file.");
-        return;
-    }
-
-    if (!SD_MMC.exists(destinationDirectory)) {
-        SD_MMC.mkdir(destinationDirectory);
-    }
-
-    File destinationFile = SD_MMC.open(destinationPath.c_str(), "w");
-    if (!destinationFile) {
-        Serial.println("Failed to create destination file.");
-        sourceFile.close();
-        return;
-    }
-
-    while (sourceFile.available()) {
-        destinationFile.write(sourceFile.read());
-    }
-
-    sourceFile.close();
-    destinationFile.close();
-
-    // Remove the source file after moving
-    LittleFS.remove(sourcePath);
-}
-void printFileContents(const char* filePath) {
-    File file = LittleFS.open(filePath, "r");
-    if (!file) {
-        Serial.println("Failed to open file.");
-        return;
-    }
-
-    int lineNumber = 1;
-    Serial.print(String(lineNumber) + ": ");
-    while (file.available()) {
-        char c = file.read();
-        Serial.print(c);
-        if (c == '\n') {
-            lineNumber++;
-            Serial.print(String(lineNumber) + ": ");
-        }
-    }
-
-    file.close();
-}
 
 int isTagInTagsList(const char* RFID) {
     read_tags_file();
@@ -705,88 +560,8 @@ void displaySuccessfulScan(int& row) {
         Serial.println(tagNLISID[row]);   
 }
 
-void led_task(void *param) {
-    const uint8_t ledSort[7] = {2, 1, 0, 6, 5, 4, 3};
-    const uint16_t ledCount = 7;
-    rgb_color colors[ledCount];
-    uint8_t brightness = 30;
-    uint16_t temp;
-    int8_t last_led = 0;
-    EventBits_t bit;
 
-    while (1) {
-        if (xQueueReceive(led_setting_queue, &temp, 0)) {
-            LEDmode = (temp >> 6) & 0xF;
-            brightness = temp & 0x3F;
 
-            // Serial.printf("temp : 0x%X\r\n", temp);
-            // Serial.printf("LEDmode : 0x%X\r\n", LEDmode);
-            // Serial.printf("brightness : 0x%X\r\n", brightness);
-        }
-
-        switch (LEDmode) {
-            case 0:
-                // LEDs off
-                for (uint16_t i = 0; i < ledCount; i++) {
-                    colors[i] = rgb_color(0, 0, 0);
-                }
-                ledStrip.write(colors, ledCount, brightness);
-                break;
-            case 1:
-                // LEDs solid green
-                for (uint16_t i = 0; i < ledCount; i++) {
-                    colors[i] = rgb_color(0, 255, 0); // Green color
-                }
-                ledStrip.write(colors, ledCount, brightness);
-                break;
-            case 2:
-                // LEDs solid orange
-                for (uint16_t i = 0; i < ledCount; i++) {
-                    colors[i] = rgb_color(255, 165, 0); // Orange color
-                }
-                ledStrip.write(colors, ledCount, brightness);
-                break;
-            case 3:
-                // LEDs solid red
-                for (uint16_t i = 0; i < ledCount; i++) {
-                    colors[i] = rgb_color(255, 0, 0); // Red color
-                }
-                ledStrip.write(colors, ledCount, brightness);
-                break;
-            case 4:
-                // LEDs green sequentially
-                for (uint16_t i = 0; i < ledCount; i++) {
-                    colors[ledSort[i]] = rgb_color(0, 255, 0); // set current led green
-                    ledStrip.write(colors, ledCount, brightness);
-                    colors[ledSort[i]] = rgb_color(0, 0, 0);
-                    delay(100);
-                }
-                break;
-            default:
-                break;
-        }
-
-        delay(10);
-    }
-}
-
-rgb_color hsvToRgb(uint16_t h, uint8_t s, uint8_t v)
-{
-    uint8_t f = (h % 60) * 255 / 60;
-    uint8_t p = (255 - s) * (uint16_t)v / 255;
-    uint8_t q = (255 - f * (uint16_t)s / 255) * (uint16_t)v / 255;
-    uint8_t t = (255 - (255 - f) * (uint16_t)s / 255) * (uint16_t)v / 255;
-    uint8_t r = 0, g = 0, b = 0;
-    switch ((h / 60) % 6) {
-    case 0: r = v; g = t; b = p; break;
-    case 1: r = q; g = v; b = p; break;
-    case 2: r = p; g = v; b = t; break;
-    case 3: r = p; g = q; b = v; break;
-    case 4: r = t; g = p; b = v; break;
-    case 5: r = v; g = p; b = q; break;
-    }
-    return rgb_color(r, g, b);
-}
 
 void add_scan_to_list(const char* path, const char* filename, const char* record) {
     String filepath = String(path) + "/" + String(filename);
@@ -801,48 +576,13 @@ void add_scan_to_list(const char* path, const char* filename, const char* record
     listFile.close(); // Close the file
 }
 
-String create_new_list() {
-    DateTime now = rtc.now();
-
-    String baseName = "-scans.csv";
-    String currentDate = String(now.year()) + "-" + String(now.month()) + "-" + String(now.day());
-    String fileName = "/" + currentDate + baseName;
-    int counter = 1;
-
-    while (LittleFS.exists(fileName.c_str())) {
-        fileName = "/" + currentDate + baseName.substring(0, baseName.indexOf('.')) + "-" + String(counter) + ".csv";
-        counter++;
-    }
-
-    File file = LittleFS.open(fileName.c_str(), "w");
-    if (file) {
-        // Add content to the file if needed
-        file.close();
-    }
-    
-    return fileName;
-}
-
-void button_pressed() { 
-    Serial.println("Button pressed - Enter Scan Mode!");
-    LEDmode = 4;
-    newLEDmode = (LEDmode << 6) | (brightness & 0x3F);
-    xQueueSend(led_setting_queue, &newLEDmode, portMAX_DELAY); // Send the new LED mode to the queue
-}
 
 
 
-void createExampleFile() {
-  File file = SD_MMC.open("/example.txt", FILE_WRITE);
-  if (file) {
-    file.println("This is an example file.");
-    file.println("You can add any content you want here.");
-    file.close();
-    Serial.println("Example file created.");
-  } else {
-    Serial.println("Failed to create example file.");
-  }
-}
+
+
+
+
 
 void handleRoot(AsyncWebServerRequest *request) {
   File file = LittleFS.open("/index.html", "r");

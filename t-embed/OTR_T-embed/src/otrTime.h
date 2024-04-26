@@ -23,13 +23,5 @@ void rtc_init(void);
 void set_RTC_at_compile(void);
 void timestamp(void);
 
-bool pmFlag;
-int year;
-int month;
-int date;
-int dOW;
-int hour;
-int minute;
-int second;
 
 #endif
