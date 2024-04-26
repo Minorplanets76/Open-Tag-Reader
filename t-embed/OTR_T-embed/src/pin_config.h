@@ -1,8 +1,6 @@
 #pragma once
 
-/*DEBUG*/
-#define WIFI_SSID             "DADSOFFICEPC"
-#define WIFI_PASSWORD         "Demelza73"
+
 
 // #define WIFI_SSID             "Your-ssid"
 // #define WIFI_PASSWORD         "Your-password"
