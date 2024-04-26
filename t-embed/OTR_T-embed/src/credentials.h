@@ -3,7 +3,7 @@
 #define CREDENTIALS_H
 
 
-#define WIFI_SSID             "Your-ssid"
-#define WIFI_PASSWORD         "Your-password"
+#define WIFI_SSID             "DADSOFFICEPC"
+#define WIFI_PASSWORD         "Demelza73"
 
 #endif
