@@ -1,11 +1,13 @@
 #include "otrFeedback.h"
 
 
+
 extern Audio *audio;
 
 extern QueueHandle_t led_setting_queue;
 extern APA102<PIN_APA102_DI, PIN_APA102_CLK> ledStrip;
 extern OneButton button;
+extern RotaryEncoder encoder;
 void initAudio() {
     audio = new Audio(0, 3, 1);
     audio->setPinout(PIN_IIS_BCLK, PIN_IIS_WCLK, PIN_IIS_DOUT);

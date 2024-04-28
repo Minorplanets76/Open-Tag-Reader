@@ -9,11 +9,9 @@
 
 
 
-#define LV_SCREEN_WIDTH       320
-#define LV_SCREEN_HEIGHT      170
-#define LV_BUF_SIZE           (LV_SCREEN_WIDTH * LV_SCREEN_HEIGHT)
+
 /*ESP32S3*/
-#define PIN_POWER_ON          46
+
 
 
 

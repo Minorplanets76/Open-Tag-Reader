@@ -1,0 +1,15 @@
+SET(SOURCES screens/ui_Startup.c
+    screens/ui_Main.c
+    ui.c
+    components/ui_comp_hook.c
+    ui_helpers.c
+    ui_events.cpp
+    images/ui_img_opensourcehardware150x150_png.c
+    images/ui_img_logo160x160_png.c
+    images/ui_img_contactless_png.c
+    images/ui_img_bluetooth_png.c
+    images/ui_img_wifi_tethering_png.c
+    images/ui_img_wifi_png.c
+    images/ui_img_sd_card_png.c)
+
+add_library(ui ${SOURCES})

@@ -15,6 +15,14 @@
 #define GMT_OFFSET_SEC        (3600 * 10)
 #define DAY_LIGHT_OFFSET_SEC  3600
 
+extern bool pmFlag;
+extern int year;
+extern int month;
+extern int date;
+extern int hour;
+extern int minute;
+extern int second;
+
 void set_RTC(int year, int month, int date,
                   int hour, int minute, int second);
 

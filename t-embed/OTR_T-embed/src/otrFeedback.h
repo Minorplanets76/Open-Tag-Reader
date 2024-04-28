@@ -15,6 +15,12 @@
 
 #define PIN_BAT_VOLT          4
 
+#define LV_BUTTON bit(0)
+#define LV_ENCODER_CW bit(1)
+#define LV_ENCODER_CCW bit(2)
+#define LV_ENCODER_LED_CW bit(3)
+#define LV_ENCODER_LED_CCW bit(4)
+
 #include "Audio.h"
 #include "FS.h"
 #include "LittleFS.h"

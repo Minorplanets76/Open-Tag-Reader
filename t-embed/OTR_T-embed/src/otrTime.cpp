@@ -2,6 +2,14 @@
 
 
 extern RTC_DS3231 rtc;
+bool pmFlag;
+int year;
+int month;
+int date;
+int hour;
+int minute;
+int second;
+
 void rtc_init() {
   
   Wire.begin(PIN_IIC_SDA, PIN_IIC_SCL);  //initialise RTC

@@ -1,6 +1,9 @@
 #include "otrScanning.h"
 
 
+
+
+
 void serial1Initialize(void) {
     Serial.begin(115200);
     Serial1.begin(SERIAL1_BAUD, SERIAL_8N1, RXD1, TXD1);
@@ -65,4 +68,35 @@ String findDogName(const char* RFID) {
     }
 
     return dogName;
+}
+
+int isTagInTagsList(const char* RFID) {
+    read_tags_file();
+    Serial.println("isInTagsList: ");
+    for (int row = 0; row < numTags; row++) {
+        if (strcmp(tagRFID[row], RFID) == 0) {
+            // Serial.print("Row ");
+            // Serial.println(row);
+            // Serial.println(tagRFID[row]);
+            return row; // Return the row if tag is found
+        }
+    }
+
+    return -1; // Return -1 if tag is not found in the array
+}
+
+bool isTagActive(const char* RFID, int& row) {
+    row = isTagInTagsList(RFID);
+    if(row != -1)  {
+
+        //Serial.println(tagStatuses[tagStatusVal[row]]);   
+        return true;
+        
+    };
+    tft.fillScreen(TFT_ORANGE);
+    tft.setTextColor(TFT_BLACK);
+    tft.drawCentreString("TAG NOT", LV_SCREEN_HEIGHT/2, 55,4);
+    tft.drawCentreString("FOUND", LV_SCREEN_HEIGHT/2, 90,4);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    return false;
 }

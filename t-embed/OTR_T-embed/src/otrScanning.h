@@ -6,6 +6,8 @@
 #include "FS.h"
 #include "LittleFS.h"
 #include "otrFeedback.h"
+#include "otrData.h"
+#include "otrDisplay.h"
 // pins
 #define RXD1 16
 #define TXD1 17
