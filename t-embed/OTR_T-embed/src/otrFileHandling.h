@@ -14,6 +14,7 @@
 #include "time.h"
 #include "Wire.h"
 #include "RTClib.h"
+#include "otrDisplay.h"
 
 
 void initFileSystem(void);

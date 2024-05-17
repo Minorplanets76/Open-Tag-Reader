@@ -12,6 +12,7 @@ void initAudio() {
     audio = new Audio(0, 3, 1);
     audio->setPinout(PIN_IIS_BCLK, PIN_IIS_WCLK, PIN_IIS_DOUT);
     audio->setVolume(21); // 0...21
+    printProgressDot();
     if (!audio->connecttoFS(LittleFS, "/sounds/start.mp3")) {
         Serial.println("Start.mp3 not found"); while (1)delay(1000);
     }
@@ -29,6 +30,7 @@ void initLED(void) {
     
     led_setting_queue = xQueueCreate(5, sizeof(uint16_t));
     xTaskCreatePinnedToCore(led_task, "led_task", 1024 * 2, led_setting_queue, 0, NULL, 0);
+    printProgressDot();
 }
 
 void led_task(void *param) {
@@ -118,6 +120,7 @@ void changeLEDmode(uint8_t LEDmode) {
 void initButton(void) {
     
     button.attachClick(button_pressed);
+    printProgressDot();
 }
 
 void button_pressed() { 
