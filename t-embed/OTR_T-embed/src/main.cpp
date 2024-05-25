@@ -38,7 +38,6 @@ QueueHandle_t led_setting_queue;
 AsyncWebServer server(80);
 
 
-
 void splash_screen(void);
 
 
@@ -82,9 +81,11 @@ void setup()
     initAudio();
     initLED();
     initButton();
+    SD_init();
    
 
- 
+
+
 
 // Serial.print("Connecting to WiFi ");  
 // WiFi.begin(WIFI_SSID,WIFI_PASSWORD);

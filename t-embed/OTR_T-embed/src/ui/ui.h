@@ -25,7 +25,6 @@ extern "C" {
 #include "ui_helpers.h"
 #include "ui_events.h"
 
-void logo_spin_Animation(lv_obj_t * TargetObject, int delay);
 // SCREEN: ui_Startup
 void ui_Startup_screen_init(void);
 extern lv_obj_t * ui_Startup;
@@ -37,22 +36,27 @@ extern lv_obj_t * ui_Label1;
 // SCREEN: ui_Main
 void ui_Main_screen_init(void);
 extern lv_obj_t * ui_Main;
-extern lv_obj_t * ui_Label2;
 extern lv_obj_t * ui_Status_Bar;
 extern lv_obj_t * ui_RFID;
-extern lv_obj_t * ui_Bluetooth;
+extern lv_obj_t * ui_Battery;
 extern lv_obj_t * ui_wifiAP;
 extern lv_obj_t * ui_wifi;
 extern lv_obj_t * ui_SD;
 extern lv_obj_t * ui_Clock;
-void ui_event____initial_actions0(lv_event_t * e);
+extern lv_obj_t * ui_Main_Panel;
+extern lv_obj_t * ui_Main_Scan;
+extern lv_obj_t * ui_Main_Label3;
+extern lv_obj_t * ui_Main_Records;
+extern lv_obj_t * ui_Main_Label1;
+extern lv_obj_t * ui_Main_Setup;
+extern lv_obj_t * ui_Main_Label2;
 extern lv_obj_t * ui____initial_actions0;
 
 
 LV_IMG_DECLARE(ui_img_opensourcehardware150x150_png);    // assets/opensourcehardware150x150.png
 LV_IMG_DECLARE(ui_img_logo160x160_png);    // assets/logo160x160.png
 LV_IMG_DECLARE(ui_img_contactless_png);    // assets/contactless.png
-LV_IMG_DECLARE(ui_img_bluetooth_png);    // assets/bluetooth.png
+LV_IMG_DECLARE(ui_img_battery_charging_20_png);    // assets/battery_charging_20.png
 LV_IMG_DECLARE(ui_img_wifi_tethering_png);    // assets/wifi_tethering.png
 LV_IMG_DECLARE(ui_img_wifi_png);    // assets/wifi.png
 LV_IMG_DECLARE(ui_img_sd_card_png);    // assets/sd_card.png

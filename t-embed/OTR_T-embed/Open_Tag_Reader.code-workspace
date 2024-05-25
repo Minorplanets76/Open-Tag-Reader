@@ -13,6 +13,9 @@
 		{
 			"name": "Blink",
 			"path": "../../../../../PlatformIO/Blink"
+		},
+		{
+			"path": "../../../../../../eez-projects/Test/src/ui"
 		}
 	],
 	"settings": {}

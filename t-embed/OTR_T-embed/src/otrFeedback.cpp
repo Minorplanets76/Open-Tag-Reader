@@ -123,6 +123,7 @@ void initButton(void) {
 void button_pressed() { 
     Serial.println("Button pressed - Enter Scan Mode!");
     changeLEDmode(4); // LEDs green sequentially
+    digitalWrite(PIN_VIBRATE, HIGH);
 }
 
 void getBatteryVoltage() {

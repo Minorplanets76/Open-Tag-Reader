@@ -3,9 +3,9 @@
 #define OTRFILEHANDLING_H
 
 #define PIN_SD_CS             39
-#define PIN_SD_SCK            40
+#define PIN_SD_SCK            40    // shared with vibrating motor
 #define PIN_SD_MOSI           41
-#define PIN_SD_MISO           38
+#define PIN_SD_MISO           38    // shared with power LED
 
 #include "FS.h"
 #include "LittleFS.h"

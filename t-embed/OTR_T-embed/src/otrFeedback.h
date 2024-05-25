@@ -15,6 +15,9 @@
 
 #define PIN_BAT_VOLT          4
 
+#define PIN_VIBRATE          40
+#define PIN_POWER_LED        38
+
 #define LV_BUTTON bit(0)
 #define LV_ENCODER_CW bit(1)
 #define LV_ENCODER_CCW bit(2)
