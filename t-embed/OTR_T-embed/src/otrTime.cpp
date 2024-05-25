@@ -17,7 +17,7 @@ void rtc_init() {
     Serial.println("Couldn't find RTC");
     // return;
   }
-  
+  printProgressDot();
   //
 }
 

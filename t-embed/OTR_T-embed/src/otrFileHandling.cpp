@@ -6,6 +6,7 @@ void initFileSystem() {
     Serial.println("An Error has occurred while mounting LittleFS"); delay(1000);
     return;
   }
+  printProgressDot();
 }
 
 void SD_init(void)
@@ -35,6 +36,7 @@ void SD_init(void)
     }
     uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
     Serial.printf("SD Card Size: %lluMB\n", cardSize);
+    printProgressDot();
     delay(500);
 }
 

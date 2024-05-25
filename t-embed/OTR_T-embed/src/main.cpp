@@ -73,10 +73,10 @@ bool scanProcessed = false;
 
 void setup()
 {
-
+    initDisplay();
     serial1Initialize();
     rtc_init();
-    initDisplay();
+    
     initFileSystem();
     initAudio();
     initLED();

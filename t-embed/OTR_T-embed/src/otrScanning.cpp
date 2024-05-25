@@ -8,6 +8,7 @@ void serial1Initialize(void) {
     Serial.begin(115200);
     Serial1.begin(SERIAL1_BAUD, SERIAL_8N1, RXD1, TXD1);
     Serial1.setTimeout(SERIAL1_TIMEOUT);
+    printProgressDot();
 }
 
 bool validateRFID(const char* RFID)    {

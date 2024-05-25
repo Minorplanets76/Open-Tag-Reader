@@ -6,6 +6,7 @@
 #include "time.h"
 #include "Wire.h"
 #include "RTClib.h"
+#include "otrDisplay.h"
 
 #define PIN_IIC_SDA           18
 #define PIN_IIC_SCL           8

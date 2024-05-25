@@ -32,6 +32,7 @@
 #include "APA102.h" 
 #include <OneButton.h> 
 #include <RotaryEncoder.h>
+#include "otrDisplay.h"
 
 static uint8_t LEDmode = 0;
 static uint16_t newLEDmode = 0;

@@ -17,7 +17,7 @@ I chose an Australian product from  [Priority 1 Design](https://www.priority1des
 The board fits inside the pipe but the standard 49mm antenna is a bit big.  The antenna wire is diabolically fine, so I designed up a carrier that holds the board and antenna, whilst also acting as a soldering jig for the fine antenna wires to A+ and A-.
 
 ### User Interface
-
+As is often the case, the software has suffered some feature creep! I have been trialing ESP32 and screen combinations from [lilygo.cc](https://www.lilygo.cc/) namely the [T-Embed](https://www.lilygo.cc/products/t-embed) and the [T-Display AMOLED Touch](https://www.lilygo.cc/products/t-display-s3-amoled). They have their pros and cons, so I have made two versions and am testing to see how they fair in the sheepyards.  Everything has/is been put together through PlatformIO and VScode with the Arduino framework.  This has been a learning experience for me.
 
 
 

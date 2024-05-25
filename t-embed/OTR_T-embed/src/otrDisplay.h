@@ -24,6 +24,6 @@ void initDisplay(void);
 void lv_begin();
 void lv_handler();
 void lv_example_btn_1(void);
-
+void printProgressDot();
 
 #endif

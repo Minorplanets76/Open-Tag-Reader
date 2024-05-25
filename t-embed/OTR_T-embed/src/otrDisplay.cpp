@@ -52,7 +52,8 @@ void initDisplay() {
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.drawCentreString("OPEN TAG", LV_SCREEN_WIDTH/2, 20, 4);
     tft.drawCentreString("READER",LV_SCREEN_WIDTH/2,45,4);
-    tft.drawCentreString("Initialising ...",LV_SCREEN_WIDTH/2,LV_SCREEN_HEIGHT/2,4);
+    tft.setCursor(LV_SCREEN_WIDTH/2-9, LV_SCREEN_HEIGHT/2);
+    tft.print("Initialising .",LV_SCREEN_WIDTH/2,LV_SCREEN_HEIGHT/2,4);
     lv_begin();
 }
 
@@ -186,4 +187,8 @@ void displaySuccessfulScan(int& row) {
         tft.setTextColor(TFT_WHITE, TFT_BLACK);
         Serial.println(tagVisual_ID[row]);
         Serial.println(tagNLISID[row]);   
+}
+
+void printProgressDot(){
+    tft.print(".");
 }
