@@ -107,10 +107,7 @@ void playWaltzingMatilda(int buzzerPin)
             
             // Play the current note
             tone(buzzerPin, frequency, noteDuration);
-            
-            // Print the note being played (optional)
-            Serial.print("Playing note: ");
-            Serial.println(melody[currentNoteIndex].c_str());
+
         }
         
         // Move to the next note
