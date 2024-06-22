@@ -7,9 +7,7 @@
 #include "ui/ui.h"
 #include "otrFileHandling.h"
 #include "otrScanning.h"
-
-
-
+#include "otrFeedback.h"
 
 LilyGo_Class amoled;
 lv_obj_t *label1;
@@ -89,10 +87,8 @@ void playClickGoesTheShears(int buzzerPin)
     int C5 = 523;
     int D5 = 587;
     int E5 = 659;
-
-
-
     tone(buzzerPin, D5, 600); 
+    delay(10);
     tone(buzzerPin, D5, 400); 
     tone(buzzerPin, C5, 200); 
     tone(buzzerPin, B4, 600); 
@@ -100,8 +96,6 @@ void playClickGoesTheShears(int buzzerPin)
     tone(buzzerPin, C5, 600); 
     tone(buzzerPin, E5, 600);
     tone(buzzerPin, C5, 1000); 
-
-
 }
 
 void setup()
