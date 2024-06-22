@@ -28,6 +28,9 @@ int noteIndex = 0;
 uint8_t rotation = 1;
 const char *format_string = "#0000ff X:%d#\n #990000 Y:%d#\n #3d3d3d Size:%s# ";
 char RFID[17];
+int vibratePin = 40;
+int RFIDBuzzerPin = 41;
+int RFIDPowerPin = 42;
 
 
 
@@ -129,12 +132,22 @@ void setup()
 
     pinMode(ledPin, OUTPUT);
     pinMode(buzzerPin, OUTPUT);
+    pinMode(RFIDPowerPin, OUTPUT);
+    digitalWrite(RFIDPowerPin, HIGH);
+
+    pinMode(vibratePin, OUTPUT);
+    digitalWrite(vibratePin, LOW);
+
+    pinMode(RFIDBuzzerPin, INPUT);
 
     digitalWrite(ledPin, LOW);
     digitalWrite(buzzerPin, LOW);
     playClickGoesTheShears(buzzerPin);
     SD_init();
     serial1Initialise();
+    digitalWrite(vibratePin, HIGH);
+    delay(500);
+    digitalWrite(vibratePin, LOW);
 }
 
 
@@ -159,7 +172,7 @@ void loop()
     if (Serial1.available()) {
         String readRFID = Serial1.readString(); //read until timeout
         readRFID.toCharArray(RFID, 17);
-        tone(buzzerPin, 523, 100);
+        tone(buzzerPin, 2000, 100);
         Serial.println(RFID);
         lv_obj_set_style_text_font(ui_Main_Label1, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_label_set_text_fmt(ui_Main_Label1, "SCAN OK \n %s",RFID);
