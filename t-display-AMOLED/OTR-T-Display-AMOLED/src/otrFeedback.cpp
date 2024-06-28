@@ -2,7 +2,20 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <esp_adc_cal.h>
+#include <driver/gpio.h>
 
+float readVbusVoltage() {
+            esp_adc_cal_characteristics_t adc_chars;
+            esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+            uint32_t v2 = 0,  raw = 0;
+            raw = analogRead(vbusPin);
+            Serial.println(raw);
+            v2 = esp_adc_cal_raw_to_voltage(raw, &adc_chars) * 2;
+            Serial.println(v2);
+            return v2;
+    
+}
 // Define a map to store note frequencies based on note names
 std::map<std::string, int> noteFrequencies = {
     {"C4", 261},
@@ -31,6 +44,10 @@ std::map<std::string, int> noteFrequencies = {
     {"B5", 988}
 };
 
+
+// Function to play the melody "Click Goes The Shears"
+#include <vector>
+
 // Function to play the melody "Click Goes The Shears"
 void playClickGoesTheShears(int buzzerPin)
 {
@@ -38,86 +55,44 @@ void playClickGoesTheShears(int buzzerPin)
     std::vector<std::string> melody = {"D5", "P", "D5", "C5", "B4", "G4", "C5", "E5", "C5"};
     
     // Corresponding note durations in milliseconds
-    const int noteDurations[] = {600, 200, 400, 200, 600, 600, 600, 600, 1000}; // Adjust durations as needed
+    const int noteDurations[] = {600, 10, 400, 200, 600, 600, 600, 600, 1000}; // Adjust durations as needed
     
-    // Variables for timing and melody index
-    static unsigned long previousMillis = 0;
-    static int currentNoteIndex = 0;
     const int noteDuration = 600; // Default note duration in milliseconds
     
-    // Check if it's time to play the next note
-    unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= noteDurations[currentNoteIndex]) {
-        // Check if the current note is a pause ("P")
-        if (melody[currentNoteIndex] == "P") {
+    for(int i = 0; i < melody.size(); i++) {
+        if (melody[i] == "P") {
             // Pause (do nothing for rest duration)
-            Serial.println("Pause");
+            delay(noteDurations[i]);
         } else {
-            // Get the frequency of the current note from the noteFrequencies map
-            int frequency = noteFrequencies[melody[currentNoteIndex]];
+            int frequency = noteFrequencies[melody[i]]; // Assuming noteFrequencies map is defined elsewhere
+            tone(buzzerPin, frequency, noteDurations[i]);
             
-            // Play the current note
-            tone(buzzerPin, frequency, noteDuration);
-            
-            // Print the note being played (optional)
-            Serial.print("Playing note: ");
-            Serial.println(melody[currentNoteIndex].c_str());
         }
-        
-        // Move to the next note
-        currentNoteIndex++;
-        if (currentNoteIndex >= melody.size()) {
-            // Reset back to the beginning of the melody
-            currentNoteIndex = 0;
-        }
-        
-        // Update the previousMillis for the next note timing
-        previousMillis = currentMillis;
     }
 }
 
-// Function to play the melody "Waltzing Matilda - Part 1" using note names
+// Function to play the melody "Waltzing Matilda" using note names
 void playWaltzingMatilda(int buzzerPin)
 {
     // Melody notes and pauses defined by their names ("P" for pause)
     std::vector<std::string> melody = {
-        "A4", "A4", "E5", "A5", "P", "A4", "D5", "E5", "P", "A4", "F#5", "G5", "A5"
+        "D5", "P", "D5", "P", "D5", "P", "D5", "B4", "G5", "P", "G5", "P", "G5", "F#5", "E5",
+        "D5", "P", "D5", "P", "D5", "E5", "D5", "P", "D5", "P", "D5", "C5", "B4", "A4"
     };
     
     // Corresponding note durations in milliseconds
     const int noteDurations[] = {
-        400, 200, 400, 400, 400, 200, 400, 400, 400, 200, 400, 400, 800
+        400, 10, 200, 5, 200, 10, 400, 400, 400, 10, 200, 5, 200, 400, 400,
+        400, 10, 200, 5, 200, 400, 200, 5, 200, 10, 400, 200, 200, 400
     }; // Adjust durations as needed
     
-    // Variables for timing and melody index
-    static unsigned long previousMillis = 0;
-    static int currentNoteIndex = 0;
-    const int noteDuration = 600; // Default note duration in milliseconds
-    
-    // Check if it's time to play the next note
-    unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= noteDurations[currentNoteIndex]) {
-        // Check if the current note is a pause ("P")
-        if (melody[currentNoteIndex] == "P") {
+    for(int i = 0; i < melody.size(); i++) {
+        if (melody[i] == "P") {
             // Pause (do nothing for rest duration)
-            Serial.println("Pause");
+            delay(noteDurations[i]);
         } else {
-            // Get the frequency of the current note from the noteFrequencies map
-            int frequency = noteFrequencies[melody[currentNoteIndex]];
-            
-            // Play the current note
-            tone(buzzerPin, frequency, noteDuration);
-
+            int frequency = noteFrequencies[melody[i]]; // Assuming noteFrequencies map is defined elsewhere
+            tone(buzzerPin, frequency, noteDurations[i]);
         }
-        
-        // Move to the next note
-        currentNoteIndex++;
-        if (currentNoteIndex >= melody.size()) {
-            // Reset back to the beginning of the melody
-            currentNoteIndex = 0;
-        }
-        
-        // Update the previousMillis for the next note timing
-        previousMillis = currentMillis;
     }
 }

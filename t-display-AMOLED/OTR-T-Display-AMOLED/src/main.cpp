@@ -19,7 +19,7 @@ int ledPin = 39;
 void toggleLed(int ledPin);
 int buzzerPin = 16;
 void playNote(int buzzerPin);
-void playClickGoesTheShears(int buzzerPin);
+
 unsigned int naturalNoteFrequencies[] = {131, 147, 165, 175, 196, 220, 247, 262, 294, 330, 349, 392, 440, 494, 
                                         523, 587, 659, 698, 784, 880, 988, 1047, 1175, 1319, 1397, 1568, 1760, 1976};
 int noteIndex = 0;
@@ -46,8 +46,12 @@ void lv_example_get_started_1(void)
         Serial.println("Home key pressed!");
         static uint32_t checkMs = 0;
         if (millis() > checkMs) {
-            lv_label_set_text(touchTest, "Home Pressed");
-            playClickGoesTheShears(buzzerPin);
+            uint16_t battVoltageTest = amoled.getBattVoltage();
+            double battVoltageInVolts = battVoltageTest / 1000.0;
+            uint16_t vbusVoltageMV = readVbusVoltage();
+            double vbusVoltage = vbusVoltageMV / 1000.0;
+            lv_label_set_text_fmt(touchTest, "Battery: %.1fV\nVBUS: %.1fV", battVoltageInVolts, vbusVoltage);
+            //playWaltzingMatilda(buzzerPin);
             
         }
         checkMs = millis() + 200;
@@ -71,6 +75,7 @@ void lv_example_get_started_1(void)
 void toggleLed(int ledPin)
 {
     digitalWrite(ledPin, !digitalRead(ledPin));
+    digitalWrite(RFIDPowerPin, !digitalRead(RFIDPowerPin));
 }
 
 void playNote(int buzzerPin)
@@ -80,23 +85,7 @@ void playNote(int buzzerPin)
     noteIndex = (noteIndex + 1) % (sizeof(naturalNoteFrequencies) / sizeof(naturalNoteFrequencies[0]));
 }
 
-void playClickGoesTheShears(int buzzerPin)
-{
-    int B4 = 494;
-    int G4 = 392;
-    int C5 = 523;
-    int D5 = 587;
-    int E5 = 659;
-    tone(buzzerPin, D5, 600); 
-    delay(10);
-    tone(buzzerPin, D5, 400); 
-    tone(buzzerPin, C5, 200); 
-    tone(buzzerPin, B4, 600); 
-    tone(buzzerPin, G4, 600); 
-    tone(buzzerPin, C5, 600); 
-    tone(buzzerPin, E5, 600);
-    tone(buzzerPin, C5, 1000); 
-}
+
 
 void setup()
 {
@@ -128,7 +117,7 @@ void setup()
     pinMode(buzzerPin, OUTPUT);
     pinMode(RFIDPowerPin, OUTPUT);
     digitalWrite(RFIDPowerPin, HIGH);
-
+    pinMode(vbusPin, INPUT);
     pinMode(vibratePin, OUTPUT);
     digitalWrite(vibratePin, LOW);
 
@@ -136,7 +125,7 @@ void setup()
 
     digitalWrite(ledPin, LOW);
     digitalWrite(buzzerPin, LOW);
-    playClickGoesTheShears(buzzerPin);
+    //playClickGoesTheShears(buzzerPin);
     SD_init();
     serial1Initialise();
     digitalWrite(vibratePin, HIGH);
