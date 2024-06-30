@@ -8,6 +8,7 @@
 #include "otrFileHandling.h"
 #include "otrScanning.h"
 #include "otrFeedback.h"
+#include "otrTime.h"
 
 LilyGo_Class amoled;
 lv_obj_t *label1;
@@ -61,14 +62,7 @@ void lv_example_get_started_1(void)
             lv_timer_del(t);
         }, 2000, NULL);
     }, NULL);
-    
-    label1 = lv_label_create(lv_scr_act());
-    lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);     /*Break the long lines*/
-    lv_label_set_recolor(label1, true);                      /*Enable re-coloring by commands in the text*/
-    lv_label_set_text_fmt(label1, format_string, 0, 0, amoled.getName());
-    lv_obj_set_width(label1, 150);  /*Set smaller width to make the lines wrap*/
-    lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_align(label1, LV_ALIGN_CENTER, 0, 100);
+
 }
 
 
@@ -148,10 +142,7 @@ void loop()
     // }
     lv_indev_t *indev = lv_indev_get_next(NULL);
     lv_point_t  point;
-    if ( indev->proc.state == LV_INDEV_STATE_PRESSED ) {
-        lv_indev_get_point(indev, &point);
-        lv_label_set_text_fmt(label1, format_string, point.x, point.y,  amoled.getName());
-    }
+
     if (Serial1.available()) {
         String readRFID = Serial1.readString(); //read until timeout
         readRFID.toCharArray(RFID, 17);
