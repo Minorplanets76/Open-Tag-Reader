@@ -30,7 +30,11 @@ void set_RTC(int year, int month, int date,
 void print_local_time(void);
 void rtc_init(void);
 void set_RTC_at_compile(void);
-void timestamp(void);
+void timeStamp(char timeStr[12], char dateStr[11]);
+void updateTimeToScreen(void);
+void updateDateToScreen(void);
+void get_RTC_temperature(void);
+
 
 
 #endif

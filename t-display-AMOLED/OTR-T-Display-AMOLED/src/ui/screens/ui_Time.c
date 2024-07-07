@@ -9,8 +9,6 @@ void ui_Time_screen_init(void)
 {
     ui_Time = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_Time, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_text_align(ui_Time, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Time, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Main_Label3 = lv_label_create(ui_Time);
     lv_obj_set_width(ui_Main_Label3, LV_SIZE_CONTENT);   /// 1
@@ -23,22 +21,23 @@ void ui_Time_screen_init(void)
     lv_obj_set_style_text_font(ui_Main_Label3, &lv_font_montserrat_40, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Time_Label_Date = lv_label_create(ui_Time);
-    lv_obj_set_width(ui_Time_Label_Date, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_width(ui_Time_Label_Date, lv_pct(90));
     lv_obj_set_height(ui_Time_Label_Date, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Time_Label_Date, lv_pct(-30));
+    lv_obj_set_x(ui_Time_Label_Date, lv_pct(0));
     lv_obj_set_y(ui_Time_Label_Date, lv_pct(-35));
     lv_obj_set_align(ui_Time_Label_Date, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Time_Label_Date, "Date:");
     lv_obj_set_style_text_font(ui_Time_Label_Date, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Time_Label_Time = lv_label_create(ui_Time);
-    lv_obj_set_width(ui_Time_Label_Time, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_width(ui_Time_Label_Time, lv_pct(90));
     lv_obj_set_height(ui_Time_Label_Time, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Time_Label_Time, lv_pct(-30));
+    lv_obj_set_x(ui_Time_Label_Time, lv_pct(0));
     lv_obj_set_y(ui_Time_Label_Time, lv_pct(-25));
     lv_obj_set_align(ui_Time_Label_Time, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Time_Label_Time, "Time:");
-    lv_obj_set_style_text_font(ui_Time_Label_Time, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_Time_Label_Time, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_Time_Label_Time, &lv_font_montserrat_40, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Time_Label_Date2 = lv_label_create(ui_Time);
     lv_obj_set_width(ui_Time_Label_Date2, LV_SIZE_CONTENT);   /// 1
@@ -49,18 +48,44 @@ void ui_Time_screen_init(void)
     lv_label_set_text(ui_Time_Label_Date2, "Updated:");
     lv_obj_set_style_text_font(ui_Time_Label_Date2, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Time_Keyboard1 = lv_keyboard_create(ui_Time);
-    lv_keyboard_set_mode(ui_Time_Keyboard1, LV_KEYBOARD_MODE_NUMBER);
-    lv_obj_set_width(ui_Time_Keyboard1, lv_pct(100));
-    lv_obj_set_height(ui_Time_Keyboard1, lv_pct(25));
-    lv_obj_set_x(ui_Time_Keyboard1, -1);
-    lv_obj_set_y(ui_Time_Keyboard1, 202);
-    lv_obj_set_align(ui_Time_Keyboard1, LV_ALIGN_CENTER);
+    ui_Time_SetTime = lv_btn_create(ui_Time);
+    lv_obj_set_width(ui_Time_SetTime, lv_pct(90));
+    lv_obj_set_height(ui_Time_SetTime, lv_pct(15));
+    lv_obj_set_x(ui_Time_SetTime, lv_pct(0));
+    lv_obj_set_y(ui_Time_SetTime, lv_pct(10));
+    lv_obj_set_align(ui_Time_SetTime, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Time_SetTime, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_Time_SetTime, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    lv_obj_set_style_outline_width(ui_Time_Keyboard1, 0, LV_PART_ITEMS | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_pad(ui_Time_Keyboard1, 0, LV_PART_ITEMS | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Time_Keyboard1, &lv_font_montserrat_32, LV_PART_ITEMS | LV_STATE_DEFAULT);
+    ui_Time_Label4 = lv_label_create(ui_Time_SetTime);
+    lv_obj_set_width(ui_Time_Label4, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Time_Label4, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Time_Label4, 5);
+    lv_obj_set_y(ui_Time_Label4, 2);
+    lv_obj_set_align(ui_Time_Label4, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Time_Label4, "SET TIME");
+    lv_obj_set_style_text_font(ui_Time_Label4, &lv_font_montserrat_40, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_Time_SetDate = lv_btn_create(ui_Time);
+    lv_obj_set_width(ui_Time_SetDate, lv_pct(90));
+    lv_obj_set_height(ui_Time_SetDate, lv_pct(15));
+    lv_obj_set_x(ui_Time_SetDate, lv_pct(0));
+    lv_obj_set_y(ui_Time_SetDate, lv_pct(30));
+    lv_obj_set_align(ui_Time_SetDate, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Time_SetDate, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_Time_SetDate, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_Time_Label1 = lv_label_create(ui_Time_SetDate);
+    lv_obj_set_width(ui_Time_Label1, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Time_Label1, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Time_Label1, 5);
+    lv_obj_set_y(ui_Time_Label1, 2);
+    lv_obj_set_align(ui_Time_Label1, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Time_Label1, "SET DATE");
+    lv_obj_set_style_text_font(ui_Time_Label1, &lv_font_montserrat_40, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_add_event_cb(ui_Time_SetTime, ui_event_Time_SetTime, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_Time_SetDate, ui_event_Time_SetDate, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Time, ui_event_Time, LV_EVENT_ALL, NULL);
 
 }

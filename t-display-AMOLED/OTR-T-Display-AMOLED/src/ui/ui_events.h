@@ -10,7 +10,10 @@
 extern "C" {
 #endif
 
+void UI_MAIN_SCREEN_LOAD(lv_event_t * e);
 void btn_event_cb(lv_event_t * e);
+void setTimeManual(lv_event_t * e);
+void setDateManual(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

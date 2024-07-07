@@ -6,6 +6,10 @@
 #include "ui.h"
 #include "ui_events.h"
 #include <Arduino.h>
+#include "otrTime.h"
+#include "otrFeedback.h"
+
+extern RTC_DS3231 rtc;
 extern int ledPin;
 extern void toggleLed(int ledPin);
 extern int buzzerPin;
@@ -18,6 +22,38 @@ void btn_event_cb(lv_event_t * e)
         /*Get the first child of the button which is the label and change its text*/
         lv_label_set_text_fmt(ui_Main_Label2, "Button: %d", cnt);
         // toggle the LED when the button is pressed
-        toggleLed(ledPin);
+        //toggleLed(ledPin);
         playNote(buzzerPin);
+}
+
+void setTimeManual(lv_event_t * e)
+{
+	// Your code here
+        int hour = lv_roller_get_selected(ui_Time_RollerHour) + 1;
+        int minute = lv_roller_get_selected(ui_Time_RollerMinute);
+        int AMPM = lv_roller_get_selected(ui_Time_RollerAMPM);
+        if (AMPM != 0) {
+            hour = hour + 12;
+        }
+        DateTime now = rtc.now();
+        rtc.adjust(DateTime(now.year(), now.month(), now.day(), hour, minute, 0));
+
+        Serial.print("Hour: ");
+        Serial.println(hour);
+        Serial.print("Minute: ");
+        Serial.println(minute);
+        Serial.print("AMPM: ");
+        Serial.println(AMPM);
+        
+}
+
+void setDateManual(lv_event_t * e)
+{
+	// Your code here
+}
+
+void UI_MAIN_SCREEN_LOAD(lv_event_t * e)
+{
+	//updateTimeToScreen();
+        //updateBatteryImage();
 }

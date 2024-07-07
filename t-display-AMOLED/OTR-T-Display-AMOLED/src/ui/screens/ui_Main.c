@@ -43,7 +43,7 @@ void ui_Main_screen_init(void)
     lv_obj_clear_flag(ui_Main_TopPanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_Main_TopPanelBattery = lv_img_create(ui_Main_TopPanel);
-    lv_img_set_src(ui_Main_TopPanelBattery, &ui_img_battery_full_png);
+    lv_img_set_src(ui_Main_TopPanelBattery, &ui_img_battery_3_bar_png);
     lv_obj_set_width(ui_Main_TopPanelBattery, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Main_TopPanelBattery, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_Main_TopPanelBattery, lv_pct(5));

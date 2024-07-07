@@ -5,10 +5,14 @@
 #include <LV_Helper.h>
 #include <lvgl.h>
 #include "ui/ui.h"
+#include "RTClib.h"
 #include "otrFileHandling.h"
 #include "otrScanning.h"
 #include "otrFeedback.h"
 #include "otrTime.h"
+
+RTC_DS3231 rtc;
+WL_134A_RFID rfid;
 
 LilyGo_Class amoled;
 lv_obj_t *label1;
@@ -33,6 +37,7 @@ int RFIDPowerPin = 42;
 
 
 
+
 void lv_example_get_started_1(void)
 {
     
@@ -54,6 +59,7 @@ void lv_example_get_started_1(void)
             lv_label_set_text_fmt(touchTest, "Battery: %.1fV\nVBUS: %.1fV", battVoltageInVolts, vbusVoltage);
             //playWaltzingMatilda(buzzerPin);
             
+
         }
         checkMs = millis() + 200;
         lv_timer_create([](lv_timer_t *t) {
@@ -79,7 +85,10 @@ void playNote(int buzzerPin)
     noteIndex = (noteIndex + 1) % (sizeof(naturalNoteFrequencies) / sizeof(naturalNoteFrequencies[0]));
 }
 
-
+void clock_timer(lv_timer_t * timer) {
+    updateTimeToScreen();
+    updateBatteryImage();
+}
 
 void setup()
 {
@@ -104,7 +113,7 @@ void setup()
     lv_disp_drv_update(lv_disp_get_default(), drv);
     
     ui_init();
-
+    lv_timer_t * timer = lv_timer_create(clock_timer, 60000, NULL);
     lv_example_get_started_1(); 
 
     pinMode(ledPin, OUTPUT);
@@ -121,7 +130,10 @@ void setup()
     digitalWrite(buzzerPin, LOW);
     //playClickGoesTheShears(buzzerPin);
     SD_init();
+    rtc_init();
     serial1Initialise();
+    updateBatteryImage();
+    updateTimeToScreen();
     digitalWrite(vibratePin, HIGH);
     delay(500);
     digitalWrite(vibratePin, LOW);
@@ -132,6 +144,7 @@ void loop()
 {
 
     lv_task_handler();
+    lv_timer_handler();
     // static unsigned long previousMillis = 0;
     // const long interval = 500;
     // unsigned long currentMillis = millis();
@@ -144,11 +157,16 @@ void loop()
     lv_point_t  point;
 
     if (Serial1.available()) {
-        String readRFID = Serial1.readString(); //read until timeout
-        readRFID.toCharArray(RFID, 17);
-        tone(buzzerPin, 2000, 100);
-        Serial.println(RFID);
-        lv_obj_set_style_text_font(ui_Main_Label1, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text_fmt(ui_Main_Label1, "SCAN OK \n %s",RFID);
+        if (Serial1.available() >= rfidMessageLength) {
+            rfid.readPacket();
+            WL_134A_RFID::rfidRead scanResult = rfid.getReading();
+            lv_obj_set_style_text_font(ui_Main_Label1, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_label_set_text_fmt(ui_Main_Label1, "SCAN OK \n %s", scanResult.rfidID);
+            Serial.print("From main - rfidID: ");
+            Serial.println(scanResult.rfidID);
+        }
+    
+        
+
     }
 }

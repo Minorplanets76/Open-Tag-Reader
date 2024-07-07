@@ -1,5 +1,7 @@
 #include "otrTime.h"
-
+#include <LV_Helper.h>
+#include <lvgl.h>
+#include "ui/ui.h"
 
 extern RTC_DS3231 rtc;
 bool pmFlag;
@@ -12,22 +14,24 @@ int second;
 
 void rtc_init() {
   
-  Wire.begin(PIN_IIC_SDA, PIN_IIC_SCL);  //initialise RTC
+  //Wire.begin(PIN_IIC_SDA, PIN_IIC_SCL);  //initialise RTC
+
   if (!rtc.begin())     {
     Serial.println("Couldn't find RTC");
     // return;
   }
+    if (rtc.lostPower()) {
+    Serial.println("RTC lost power, let's set the time!");
+    // When time needs to be set on a new device, or after a power loss, the
+    // following line sets the RTC to the date & time this sketch was compiled
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    // This line sets the RTC with an explicit date & time, for example to set
+    // January 21, 2014 at 3am you would call:
+    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+  }
 
 }
 
-void print_local_time()   {
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo))   {
-        Serial.println("Failed to obtain time");
-        return;
-    }
-    Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-}
 
 void set_RTC(int year, int month, int date, 
                   int hour, int minute, int second)   {
@@ -39,7 +43,7 @@ void set_RTC_at_compile()   {
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
-void timestamp(char timeStr[12], char dateStr[11]) {
+void timeStamp(char timeStr[12], char dateStr[11]) {
     // Display RTC time and date
     DateTime now = rtc.now();
 
@@ -52,17 +56,29 @@ void timestamp(char timeStr[12], char dateStr[11]) {
     sprintf(dateStr, "%d/%d/%d", now.day(), now.month(), now.year());
 }
 
-void get_NTP_time() {
-    configTime(GMT_OFFSET_SEC, DAY_LIGHT_OFFSET_SEC, NTP_SERVER1, NTP_SERVER2);
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo))   {
-        Serial.println("Failed to obtain time");
-        return;
+void updateTimeToScreen()   {
+    char timeClock[5];
+    DateTime now = rtc.now();
+    if (now.isPM()) {
+        sprintf(timeClock, "%d:%02d", now.hour() - 12, now.minute());
+        lv_label_set_text_fmt(ui_Time_Label_Time, "%s PM", timeClock);
+    } else {
+        sprintf(timeClock, "%d:%02d", now.hour(), now.minute());
+        lv_label_set_text_fmt(ui_Time_Label_Time, "%s AM", timeClock);
     }
-    rtc.adjust(DateTime(timeinfo.tm_year+1900,timeinfo.tm_mon+1,timeinfo.tm_mday,
-                        timeinfo.tm_hour, timeinfo.tm_min,timeinfo.tm_sec));
+    lv_label_set_text_fmt(ui_Main_TopPanelTime, "%s", timeClock);
+    
+
+}
+
+void updateDateToScreen()   {
+    char dateStr[11];
+    DateTime now = rtc.now();
+    sprintf(dateStr, "%d/%d/%d", now.day(), now.month(), now.year());
+    
+    lv_label_set_text_fmt(ui_Time_Label_Date, "Date: %s", dateStr);
 }
 
 void get_RTC_temperature() {
-    Serial.printf(" Temperature: %.1f `C\r\n", rtc.getTemperature());
+    Serial.printf(" Temperature: %.1f °C\r\n", rtc.getTemperature());
 }

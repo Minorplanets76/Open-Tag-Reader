@@ -8,5 +8,7 @@ const int vbusPin = 1;
 void playClickGoesTheShears(int buzzerPin);
 void playWaltzingMatilda(int buzzerPin);
 float readVbusVoltage();
+uint16_t batteryVoltage();
+void updateBatteryImage();
 
 #endif
