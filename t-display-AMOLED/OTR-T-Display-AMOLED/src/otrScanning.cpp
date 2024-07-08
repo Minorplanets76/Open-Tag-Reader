@@ -21,7 +21,16 @@ void WL_134A_RFID:: readPacket()   {
     
     char packet[rfid_packet_size];
     packet[rfid_packet_startcode] = Serial1.read();
-
+    
+    // Packet should be transmitted as follows:
+    // LSB                                                                                      MSB
+    // ____________________________________________________________________________________________
+    // | Start |  Tag | Country | Data | Animal | Reserved | Reserved | Checksum | ~Checksum | End |
+    // | Code  |  ID  |   ID    | Flag |  Flag  |          |          |          |           | Code| 
+    // | 1byte |10byte|  4byte  | 1byte|  1byte |   4byte  |   6byte  |   1byte  |   1byte   |1byte|
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // 0       1      11        15     16       17         21         27         28          29    30
+    
     if (packet[rfid_packet_startcode] != 0x02) {
         //not the start
         return;
