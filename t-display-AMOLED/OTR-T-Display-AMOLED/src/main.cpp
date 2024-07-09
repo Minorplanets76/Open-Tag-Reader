@@ -162,8 +162,7 @@ void loop()
             WL_134A_RFID::rfidRead scanResult = rfid.getReading();
             lv_obj_set_style_text_font(ui_Main_Label1, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_label_set_text_fmt(ui_Main_Label1, "SCAN OK \n %s", scanResult.rfidID);
-            Serial.print("From main - rfidID: ");
-            Serial.println(scanResult.rfidID);
+
         }
     
         
