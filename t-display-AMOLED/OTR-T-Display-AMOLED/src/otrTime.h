@@ -6,6 +6,7 @@
 #include "time.h"
 #include "Wire.h"
 #include "RTClib.h"
+#include "otrFeedback.h"
 
 
 #define PIN_IIC_SDA           3
@@ -34,7 +35,7 @@ void timeStamp(char timeStr[12], char dateStr[11]);
 void updateTimeToScreen(void);
 void updateDateToScreen(void);
 void get_RTC_temperature(void);
-
+void clock_timer(lv_timer_t * timer);
 
 
 #endif

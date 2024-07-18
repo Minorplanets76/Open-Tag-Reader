@@ -8,8 +8,11 @@
 #include <Arduino.h>
 #include "otrTime.h"
 #include "otrFeedback.h"
+#include "otrScanning.h"
 
 extern RTC_DS3231 rtc;
+extern VIBRATE vibrate;
+extern RFIDReader reader;
 extern int ledPin;
 extern void toggleLed(int ledPin);
 extern int buzzerPin;
@@ -24,6 +27,8 @@ void btn_event_cb(lv_event_t * e)
         // toggle the LED when the button is pressed
         //toggleLed(ledPin);
         playNote(buzzerPin);
+
+        reader.toggle();
 }
 
 void setTimeManual(lv_event_t * e)
@@ -56,4 +61,11 @@ void UI_MAIN_SCREEN_LOAD(lv_event_t * e)
 {
 	//updateTimeToScreen();
         //updateBatteryImage();
+}
+
+
+
+void scanSwitched(lv_event_t * e)
+{
+	reader.toggle();
 }

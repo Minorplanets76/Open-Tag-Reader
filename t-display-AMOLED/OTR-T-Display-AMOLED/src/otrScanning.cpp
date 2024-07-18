@@ -1,17 +1,21 @@
 #include "otrScanning.h"
 
 
-bool scanBoard = false; //false for ASCII output (Priority1), true for hex output (WL-134A)
 
-
-
-void serial1Initialise(void) {
-    //Serial.begin(115200);
-    Serial1.begin(SERIAL1_BAUD, SERIAL_8N1, RXD1, TXD1);
-    Serial1.setTimeout(SERIAL1_TIMEOUT);
-    //printProgressDot();
-    Serial.println("Serial1 initialised");
+    
+    
+void RFIDReader::begin(void) {
+    
+    Serial1.begin(config.baud, SERIAL_8N1, config.RXD1, config.TXD1);
+    Serial1.setTimeout(config.timeout);
+    
+    pinMode(config.RFIDPowerPin, OUTPUT);
+    
+    activate();
 }
+
+
+
 
 void validateRFID(void) {
     
@@ -35,7 +39,6 @@ void WL_134A_RFID:: readPacket()   {
         //not the start
         return;
     }
-
     uint8_t read;
 
     read = Serial1.readBytes(&(packet[rfid_packet_ID]), rfid_packet_size - 1);
@@ -71,10 +74,6 @@ void WL_134A_RFID:: readPacket()   {
         Serial.println("Wrong endcode");
         return;
     }
-
-
-    
-
     //tagID and countryID are low data first.
     //coverting to decimal requires shifting left by 4 bits
     //start with tagID
@@ -98,18 +97,13 @@ void WL_134A_RFID:: readPacket()   {
         reading.countryID += hex_to_uint64(packet[i]);
     }
     Serial.println(reading.countryID);
-    
     reading.isAnimal = hex_to_uint64(packet[rfid_packet_animal]);
-
     Serial.print(" Is Animal: ");
     Serial.println(reading.isAnimal);
-
     snprintf(reading.rfidID, sizeof(reading.rfidID), "%03u %012llu", reading.countryID, reading.tagID);
     Serial.print("RFID ID: ");
     Serial.println(reading.rfidID);
-
     return;
-
 }
 
 uint64_t WL_134A_RFID:: hex_to_uint64(const char c) {
@@ -127,4 +121,43 @@ uint64_t WL_134A_RFID:: hex_to_uint64(const char c) {
 
 WL_134A_RFID::rfidRead WL_134A_RFID:: getReading() const {
     return reading;
+}
+
+void RFIDReader::activate() {
+    digitalWrite(config.RFIDPowerPin, HIGH);
+    readerStatus = 1;
+    updateScanIcon();
+}
+void RFIDReader::deactivate() {
+    digitalWrite(config.RFIDPowerPin, LOW);
+    readerStatus = 0;
+    updateScanIcon();
+}
+
+void RFIDReader::toggle() {
+    readerStatus = !readerStatus;
+    
+    if(readerStatus) {
+        activate();
+    } else {
+        deactivate();
+    }
+}
+
+
+void RFIDReader::updateScanIcon() {
+    const lv_img_dsc_t* image;
+    extern const lv_img_dsc_t ui_img_contactless_png;
+    extern const lv_img_dsc_t ui_img_contactless_off_png;
+    Serial.print("Update icon: ");
+    Serial.println(readerStatus);
+    if(readerStatus) {
+        Serial.println("Reader active");
+        image = &ui_img_contactless_png;
+    } else {
+        Serial.println("Reader inactive");
+        image = &ui_img_contactless_off_png;
+    }
+    lv_img_set_src(ui_Main_TopPanelScan,image);
+    lv_img_set_src(ui_Scan_TopPanelScan,image);
 }

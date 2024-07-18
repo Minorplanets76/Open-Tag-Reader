@@ -5,15 +5,15 @@
 #include <Arduino.h>
 #include "FS.h"
 #include "LittleFS.h"
+#include <LV_Helper.h>
+#include <lvgl.h>
+#include "ui/ui.h"
 //#include "otrFeedback.h"
 //#include "otrData.h"
 //#include "otrDisplay.h"
 // pins
-#define RXD1 10
-#define TXD1 11
 
-#define SERIAL1_BAUD 9600
-#define SERIAL1_TIMEOUT 50
+
 
 
 void serial1Initialise(void);
@@ -51,6 +51,31 @@ private:
     uint64_t hex_to_uint64(const char c);
 
     rfidRead reading;
+};
+
+class RFIDReader {
+    public:
+        struct RFIDConfig{
+            const uint8_t RFIDPowerPin = 42;
+            const uint8_t TXD1 = 11;
+            const uint8_t RXD1 = 10;
+            const uint16_t baud = 9600;
+            const uint16_t timeout = 50;
+            const uint8_t messageLength = 30;
+
+        };
+        String scanError;
+        bool readerBoard;
+        bool readerStatus = 0;
+        void begin(void);
+        void activate();
+        void deactivate();
+        void toggle();
+        void updateScanIcon();
+    private:
+         RFIDConfig config;
+         
+         
 };
 
 

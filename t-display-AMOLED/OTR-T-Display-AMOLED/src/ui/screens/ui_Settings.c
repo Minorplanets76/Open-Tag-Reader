@@ -10,87 +10,104 @@ void ui_Settings_screen_init(void)
     ui_Settings = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_Settings, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_SettingsTopPanel = lv_obj_create(ui_Settings);
-    lv_obj_set_width(ui_SettingsTopPanel, lv_pct(100));
-    lv_obj_set_height(ui_SettingsTopPanel, lv_pct(10));
-    lv_obj_set_x(ui_SettingsTopPanel, lv_pct(0));
-    lv_obj_set_y(ui_SettingsTopPanel, lv_pct(-45));
-    lv_obj_set_align(ui_SettingsTopPanel, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_SettingsTopPanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_Settings_TabView = lv_tabview_create(ui_Settings, LV_DIR_BOTTOM, 100);
+    lv_obj_set_width(ui_Settings_TabView, lv_pct(100));
+    lv_obj_set_height(ui_Settings_TabView, lv_pct(100));
+    lv_obj_set_align(ui_Settings_TabView, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_Settings_TabView, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_text_font(ui_Settings_TabView, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_SettingsTopPanelBattery = lv_img_create(ui_SettingsTopPanel);
-    lv_img_set_src(ui_SettingsTopPanelBattery, &ui_img_battery_3_bar_png);
-    lv_obj_set_width(ui_SettingsTopPanelBattery, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_SettingsTopPanelBattery, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_SettingsTopPanelBattery, lv_pct(5));
-    lv_obj_set_y(ui_SettingsTopPanelBattery, lv_pct(0));
-    lv_obj_set_align(ui_SettingsTopPanelBattery, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_SettingsTopPanelBattery, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(ui_SettingsTopPanelBattery, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_text_align(lv_tabview_get_tab_btns(ui_Settings_TabView), LV_TEXT_ALIGN_AUTO,
+                                LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_SettingsTopPanelButtonTime = lv_btn_create(ui_SettingsTopPanel);
-    lv_obj_set_height(ui_SettingsTopPanelButtonTime, 48);
-    lv_obj_set_width(ui_SettingsTopPanelButtonTime, lv_pct(40));
-    lv_obj_set_x(ui_SettingsTopPanelButtonTime, lv_pct(35));
-    lv_obj_set_y(ui_SettingsTopPanelButtonTime, lv_pct(0));
-    lv_obj_set_align(ui_SettingsTopPanelButtonTime, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_SettingsTopPanelButtonTime, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_SettingsTopPanelButtonTime, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_SettingsTopPanelButtonTime, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_SettingsTopPanelButtonTime, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui_SettingsTopPanelButtonTime, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_spread(ui_SettingsTopPanelButtonTime, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_Settings_TabPageScan = lv_tabview_add_tab(ui_Settings_TabView, "SCAN");
+    lv_obj_set_style_text_color(ui_Settings_TabPageScan, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_Settings_TabPageScan, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_Settings_TabPageScan, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_SettingsTopPanelTime = lv_label_create(ui_SettingsTopPanelButtonTime);
-    lv_obj_set_width(ui_SettingsTopPanelTime, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_SettingsTopPanelTime, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_SettingsTopPanelTime, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_SettingsTopPanelTime, "22:59");
-    lv_obj_set_style_text_color(ui_SettingsTopPanelTime, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_SettingsTopPanelTime, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_SettingsTopPanelTime, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_Settings_SwitchScan = lv_switch_create(ui_Settings_TabPageScan);
+    lv_obj_set_width(ui_Settings_SwitchScan, lv_pct(80));
+    lv_obj_set_height(ui_Settings_SwitchScan, lv_pct(25));
+    lv_obj_set_x(ui_Settings_SwitchScan, lv_pct(0));
+    lv_obj_set_y(ui_Settings_SwitchScan, lv_pct(-30));
+    lv_obj_set_align(ui_Settings_SwitchScan, LV_ALIGN_CENTER);
 
-    ui_Settings_Switch1 = lv_switch_create(ui_Settings);
-    lv_obj_set_width(ui_Settings_Switch1, lv_pct(50));
-    lv_obj_set_height(ui_Settings_Switch1, lv_pct(15));
-    lv_obj_set_x(ui_Settings_Switch1, lv_pct(-10));
-    lv_obj_set_y(ui_Settings_Switch1, lv_pct(-30));
-    lv_obj_set_align(ui_Settings_Switch1, LV_ALIGN_CENTER);
+    lv_obj_set_style_bg_img_src(ui_Settings_SwitchScan, &ui_img_contactless_off_png, LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(ui_Settings_SwitchScan, &ui_img_contactless_png, LV_PART_KNOB | LV_STATE_CHECKED);
 
-    lv_obj_set_style_bg_img_src(ui_Settings_Switch1, &ui_img_wifi_tethering_off_png, LV_PART_KNOB | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_src(ui_Settings_Switch1, &ui_img_wifi_tethering_png, LV_PART_KNOB | LV_STATE_CHECKED);
+    ui_Settings_CheckboxWL134A = lv_checkbox_create(ui_Settings_TabPageScan);
+    lv_checkbox_set_text(ui_Settings_CheckboxWL134A, "WL-134A");
+    lv_obj_set_width(ui_Settings_CheckboxWL134A, lv_pct(100));
+    lv_obj_set_height(ui_Settings_CheckboxWL134A, lv_pct(10));
+    lv_obj_set_x(ui_Settings_CheckboxWL134A, lv_pct(0));
+    lv_obj_set_y(ui_Settings_CheckboxWL134A, lv_pct(25));
+    lv_obj_set_align(ui_Settings_CheckboxWL134A, LV_ALIGN_CENTER);
+    lv_obj_add_state(ui_Settings_CheckboxWL134A, LV_STATE_CHECKED);       /// States
+    lv_obj_add_flag(ui_Settings_CheckboxWL134A, LV_OBJ_FLAG_EVENT_BUBBLE | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_Settings_CheckboxWL134A, LV_OBJ_FLAG_PRESS_LOCK);      /// Flags
+    lv_obj_set_style_text_align(ui_Settings_CheckboxWL134A, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_Settings_CheckboxWL134A, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Settings_Switch2 = lv_switch_create(ui_Settings);
-    lv_obj_set_width(ui_Settings_Switch2, lv_pct(50));
-    lv_obj_set_height(ui_Settings_Switch2, lv_pct(15));
-    lv_obj_set_x(ui_Settings_Switch2, lv_pct(-10));
-    lv_obj_set_y(ui_Settings_Switch2, lv_pct(-10));
-    lv_obj_set_align(ui_Settings_Switch2, LV_ALIGN_CENTER);
+    lv_obj_set_style_radius(ui_Settings_CheckboxWL134A, 32, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_Settings_CheckboxWL134A, lv_color_hex(0x2095F6), LV_PART_INDICATOR | LV_STATE_CHECKED);
+    lv_obj_set_style_bg_opa(ui_Settings_CheckboxWL134A, 255, LV_PART_INDICATOR | LV_STATE_CHECKED);
 
-    lv_obj_set_style_bg_img_src(ui_Settings_Switch2, &ui_img_wifi_off_png, LV_PART_KNOB | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_src(ui_Settings_Switch2, &ui_img_wifi_png, LV_PART_KNOB | LV_STATE_CHECKED);
+    ui_Settings_CheckboxP1Design = lv_checkbox_create(ui_Settings_TabPageScan);
+    lv_checkbox_set_text(ui_Settings_CheckboxP1Design, "RFIDRW-E");
+    lv_obj_set_width(ui_Settings_CheckboxP1Design, lv_pct(100));
+    lv_obj_set_height(ui_Settings_CheckboxP1Design, lv_pct(10));
+    lv_obj_set_x(ui_Settings_CheckboxP1Design, lv_pct(0));
+    lv_obj_set_y(ui_Settings_CheckboxP1Design, lv_pct(40));
+    lv_obj_set_align(ui_Settings_CheckboxP1Design, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Settings_CheckboxP1Design, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_text_font(ui_Settings_CheckboxP1Design, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Settings_Switch3 = lv_switch_create(ui_Settings);
-    lv_obj_set_width(ui_Settings_Switch3, lv_pct(50));
-    lv_obj_set_height(ui_Settings_Switch3, lv_pct(15));
-    lv_obj_set_x(ui_Settings_Switch3, lv_pct(-10));
-    lv_obj_set_y(ui_Settings_Switch3, lv_pct(10));
-    lv_obj_set_align(ui_Settings_Switch3, LV_ALIGN_CENTER);
+    lv_obj_set_style_radius(ui_Settings_CheckboxP1Design, 32, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_bg_img_src(ui_Settings_Switch3, &ui_img_bluetooth_disabled_png, LV_PART_KNOB | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_src(ui_Settings_Switch3, &ui_img_bluetooth_png, LV_PART_KNOB | LV_STATE_CHECKED);
+    ui_Settings_LabelScanResult = lv_label_create(ui_Settings_TabPageScan);
+    lv_obj_set_width(ui_Settings_LabelScanResult, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Settings_LabelScanResult, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Settings_LabelScanResult, lv_pct(0));
+    lv_obj_set_y(ui_Settings_LabelScanResult, lv_pct(-5));
+    lv_obj_set_align(ui_Settings_LabelScanResult, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Settings_LabelScanResult, "---_----------");
+    lv_obj_set_style_text_font(ui_Settings_LabelScanResult, &lv_font_montserrat_40, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Settings_Switch4 = lv_switch_create(ui_Settings);
-    lv_obj_set_width(ui_Settings_Switch4, lv_pct(50));
-    lv_obj_set_height(ui_Settings_Switch4, lv_pct(15));
-    lv_obj_set_x(ui_Settings_Switch4, lv_pct(-10));
-    lv_obj_set_y(ui_Settings_Switch4, lv_pct(30));
-    lv_obj_set_align(ui_Settings_Switch4, LV_ALIGN_CENTER);
+    ui_Settings_TabPageAP = lv_tabview_add_tab(ui_Settings_TabView, "AP");
 
-    lv_obj_set_style_bg_img_src(ui_Settings_Switch4, &ui_img_contactless_off_png, LV_PART_KNOB | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_src(ui_Settings_Switch4, &ui_img_contactless_png, LV_PART_KNOB | LV_STATE_CHECKED);
+    ui_Settings_SwitchAP = lv_switch_create(ui_Settings_TabPageAP);
+    lv_obj_set_width(ui_Settings_SwitchAP, lv_pct(50));
+    lv_obj_set_height(ui_Settings_SwitchAP, lv_pct(15));
+    lv_obj_set_x(ui_Settings_SwitchAP, lv_pct(-10));
+    lv_obj_set_y(ui_Settings_SwitchAP, lv_pct(31));
+    lv_obj_set_align(ui_Settings_SwitchAP, LV_ALIGN_CENTER);
 
-    lv_obj_add_event_cb(ui_SettingsTopPanelButtonTime, ui_event_SettingsTopPanelButtonTime, LV_EVENT_ALL, NULL);
+    lv_obj_set_style_bg_img_src(ui_Settings_SwitchAP, &ui_img_wifi_tethering_off_png, LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(ui_Settings_SwitchAP, &ui_img_wifi_tethering_png, LV_PART_KNOB | LV_STATE_CHECKED);
+
+    ui_Settings_SwitchWifi = lv_switch_create(ui_Settings_TabPageAP);
+    lv_obj_set_width(ui_Settings_SwitchWifi, lv_pct(50));
+    lv_obj_set_height(ui_Settings_SwitchWifi, lv_pct(15));
+    lv_obj_set_x(ui_Settings_SwitchWifi, lv_pct(-10));
+    lv_obj_set_y(ui_Settings_SwitchWifi, lv_pct(-10));
+    lv_obj_set_align(ui_Settings_SwitchWifi, LV_ALIGN_CENTER);
+
+    lv_obj_set_style_bg_img_src(ui_Settings_SwitchWifi, &ui_img_wifi_off_png, LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(ui_Settings_SwitchWifi, &ui_img_wifi_png, LV_PART_KNOB | LV_STATE_CHECKED);
+
+    ui_Settings_SwitchBlueTooth = lv_switch_create(ui_Settings_TabPageAP);
+    lv_obj_set_width(ui_Settings_SwitchBlueTooth, lv_pct(50));
+    lv_obj_set_height(ui_Settings_SwitchBlueTooth, lv_pct(15));
+    lv_obj_set_x(ui_Settings_SwitchBlueTooth, lv_pct(-10));
+    lv_obj_set_y(ui_Settings_SwitchBlueTooth, lv_pct(10));
+    lv_obj_set_align(ui_Settings_SwitchBlueTooth, LV_ALIGN_CENTER);
+
+    lv_obj_set_style_bg_img_src(ui_Settings_SwitchBlueTooth, &ui_img_bluetooth_disabled_png,
+                                LV_PART_KNOB | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(ui_Settings_SwitchBlueTooth, &ui_img_bluetooth_png, LV_PART_KNOB | LV_STATE_CHECKED);
+
+    lv_obj_add_event_cb(ui_Settings_CheckboxWL134A, ui_event_Settings_CheckboxWL134A, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_Settings_CheckboxP1Design, ui_event_Settings_CheckboxP1Design, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Settings, ui_event_Settings, LV_EVENT_ALL, NULL);
 
 }

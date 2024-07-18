@@ -25,9 +25,7 @@ void rtc_init() {
     // When time needs to be set on a new device, or after a power loss, the
     // following line sets the RTC to the date & time this sketch was compiled
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    // This line sets the RTC with an explicit date & time, for example to set
-    // January 21, 2014 at 3am you would call:
-    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+
   }
 
 }
@@ -67,8 +65,7 @@ void updateTimeToScreen()   {
         lv_label_set_text_fmt(ui_Time_Label_Time, "%s AM", timeClock);
     }
     lv_label_set_text_fmt(ui_Main_TopPanelTime, "%s", timeClock);
-    
-
+    lv_label_set_text_fmt(ui_Scan_TopPanelTime, "%s", timeClock);
 }
 
 void updateDateToScreen()   {
@@ -81,4 +78,8 @@ void updateDateToScreen()   {
 
 void get_RTC_temperature() {
     Serial.printf(" Temperature: %.1f °C\r\n", rtc.getTemperature());
+}
+void clock_timer(lv_timer_t * timer) {
+    updateTimeToScreen();
+    updateBatteryImage();
 }

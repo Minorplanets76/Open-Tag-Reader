@@ -10,6 +10,9 @@
 #include "ui/ui.h"
 
 extern LilyGo_Class amoled;
+extern LED led;
+int buzzTime;
+int startBuzzTime;
 
 float readVbusVoltage() {
             esp_adc_cal_characteristics_t adc_chars;
@@ -39,7 +42,7 @@ extern const lv_img_dsc_t ui_img_battery_charging_full_png;
 
 void updateBatteryImage() {
     uint16_t voltage = batteryVoltage();
-    // uint16_t vbus = readVbusVoltage();
+    uint16_t vbus = readVbusVoltage();
 
 
     const lv_img_dsc_t* image;
@@ -60,10 +63,11 @@ void updateBatteryImage() {
     } else {
         image = &ui_img_battery_alert_png;
     }
-    // if (vbus >= 4000) { 
-    //     image = &ui_img_battery_charging_full_png;
-    //}
+    if (vbus >= 4000) { 
+        image = &ui_img_battery_charging_full_png;
+    }
     lv_img_set_src(ui_Main_TopPanelBattery, image);
+    lv_img_set_src(ui_Scan_TopPanelBattery, image);
 }
 
 // Define a map to store note frequencies based on note names
@@ -145,4 +149,108 @@ void playWaltzingMatilda(int buzzerPin)
             tone(buzzerPin, frequency, noteDurations[i]);
         }
     }
+}
+
+void LED::init(){
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, LOW);
+    ledcAttachPin(ledPin, 1);
+    lv_timer_create(led_timer, fade.interval, NULL);
+    ledcSetup(1, 5000, 10);
+}
+
+void LED::toggle(){
+    digitalWrite(ledPin, !digitalRead(ledPin));
+}
+
+void LED::flash(){
+    fade.status = 1;
+    fade.direction = 1;
+    fade.duty = 900;
+    ledcWrite(1, fade.duty);
+
+}
+void LED::pulsing(){
+    if(fade.status){
+        if(fade.direction){
+            fade.duty += fade.increment;
+            if(fade.duty >= fade.max){
+                fade.duty = fade.max;
+                fade.direction = 0;
+            }
+        }else{
+            fade.duty -= fade.increment;
+            if(fade.duty <= fade.min){
+                fade.duty = fade.min;
+                fade.direction = 1;
+            }
+        }
+        ledcWrite(1, fade.duty);
+    }
+    
+}
+void led_timer(lv_timer_t * timer) {
+    led.pulsing();
+}
+void VIBRATE::begin() {
+    pinMode(vibratePin, OUTPUT);
+    digitalWrite(vibratePin, LOW);
+}
+void VIBRATE::longBuzz() {
+    digitalWrite(vibratePin, HIGH);
+    lv_timer_create([](lv_timer_t *t) {
+        vibrateStop();
+        lv_timer_del(t);
+    }, 2000, NULL);
+}
+
+void VIBRATE::error() {
+    digitalWrite(vibratePin, HIGH);
+    lv_timer_create([](lv_timer_t *t) {
+        vibrateStop();
+        lv_timer_del(t);
+    }, 1000, NULL);
+        
+    lv_timer_create([](lv_timer_t *t) {
+        vibrateStart();
+        lv_timer_del(t);
+    }, 1200, NULL);
+
+    lv_timer_create([](lv_timer_t *t) {
+        vibrateStop();
+        lv_timer_del(t);
+    }, 2200, NULL);
+}
+
+void VIBRATE::success() {
+    digitalWrite(vibratePin, HIGH);
+    lv_timer_create([](lv_timer_t *t) {
+        vibrateStop();
+        lv_timer_del(t);
+    }, 700, NULL);
+}
+
+
+void VIBRATE::tap() {
+    digitalWrite(vibratePin, HIGH);
+    lv_timer_create([](lv_timer_t *t) {
+        vibrateStop();
+        lv_timer_del(t);
+    }, 500, NULL);
+}
+
+void VIBRATE::stop() {
+    digitalWrite(vibratePin, LOW);
+}
+void VIBRATE::toggle() {
+     digitalWrite(vibratePin, !digitalRead(vibratePin));
+}
+
+void vibrateStop(void) {
+    VIBRATE vibe;
+    digitalWrite(vibe.vibratePin, LOW);
+}
+void vibrateStart(void) {
+    VIBRATE vibe;
+    digitalWrite(vibe.vibratePin, HIGH);
 }

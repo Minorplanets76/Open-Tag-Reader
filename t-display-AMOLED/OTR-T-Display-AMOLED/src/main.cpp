@@ -13,6 +13,9 @@
 
 RTC_DS3231 rtc;
 WL_134A_RFID rfid;
+RFIDReader reader;
+LED led;
+VIBRATE vibrate;
 
 LilyGo_Class amoled;
 lv_obj_t *label1;
@@ -20,8 +23,8 @@ lv_obj_t *testButtonLabel;
 lv_obj_t *labelSlider;
 lv_obj_t *touchTest;
 uint8_t btnPin = 0;
-int ledPin = 39;
-void toggleLed(int ledPin);
+
+
 int buzzerPin = 16;
 void playNote(int buzzerPin);
 
@@ -31,9 +34,9 @@ int noteIndex = 0;
 uint8_t rotation = 1;
 const char *format_string = "#0000ff X:%d#\n #990000 Y:%d#\n #3d3d3d Size:%s# ";
 char RFID[17];
-int vibratePin = 40;
+//int vibratePin = 40;
 int RFIDBuzzerPin = 41;
-int RFIDPowerPin = 42;
+
 
 
 
@@ -58,6 +61,7 @@ void lv_example_get_started_1(void)
             double vbusVoltage = vbusVoltageMV / 1000.0;
             lv_label_set_text_fmt(touchTest, "Battery: %.1fV\nVBUS: %.1fV", battVoltageInVolts, vbusVoltage);
             //playWaltzingMatilda(buzzerPin);
+            vibrate.tap();
             
 
         }
@@ -72,11 +76,7 @@ void lv_example_get_started_1(void)
 }
 
 
-void toggleLed(int ledPin)
-{
-    digitalWrite(ledPin, !digitalRead(ledPin));
-    digitalWrite(RFIDPowerPin, !digitalRead(RFIDPowerPin));
-}
+
 
 void playNote(int buzzerPin)
 {
@@ -85,10 +85,7 @@ void playNote(int buzzerPin)
     noteIndex = (noteIndex + 1) % (sizeof(naturalNoteFrequencies) / sizeof(naturalNoteFrequencies[0]));
 }
 
-void clock_timer(lv_timer_t * timer) {
-    updateTimeToScreen();
-    updateBatteryImage();
-}
+
 
 void setup()
 {
@@ -114,29 +111,32 @@ void setup()
     
     ui_init();
     lv_timer_t * timer = lv_timer_create(clock_timer, 60000, NULL);
+    lv_timer_t * timer2 = lv_timer_create(led_timer, 50, NULL);
     lv_example_get_started_1(); 
 
-    pinMode(ledPin, OUTPUT);
+   
     pinMode(buzzerPin, OUTPUT);
-    pinMode(RFIDPowerPin, OUTPUT);
-    digitalWrite(RFIDPowerPin, HIGH);
     pinMode(vbusPin, INPUT);
-    pinMode(vibratePin, OUTPUT);
-    digitalWrite(vibratePin, LOW);
+
 
     pinMode(RFIDBuzzerPin, INPUT);
 
-    digitalWrite(ledPin, LOW);
+    
     digitalWrite(buzzerPin, LOW);
     //playClickGoesTheShears(buzzerPin);
     SD_init();
     rtc_init();
-    serial1Initialise();
+    reader.begin();
+    led.init();
+    vibrate.begin();
+    vibrate.longBuzz();
+    // playWaltzingMatilda(buzzerPin);
+    // playClickGoesTheShears(buzzerPin);
+    
     updateBatteryImage();
     updateTimeToScreen();
-    digitalWrite(vibratePin, HIGH);
-    delay(500);
-    digitalWrite(vibratePin, LOW);
+    reader.updateScanIcon();
+
 }
 
 

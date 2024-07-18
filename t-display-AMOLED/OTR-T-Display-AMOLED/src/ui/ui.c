@@ -19,13 +19,22 @@ lv_obj_t * ui_Main_Button1;
 lv_obj_t * ui_Main_Label2;
 lv_obj_t * ui_Main_TopPanel;
 lv_obj_t * ui_Main_TopPanelBattery;
+void ui_event_Main_TopPanelScan(lv_event_t * e);
 lv_obj_t * ui_Main_TopPanelScan;
 void ui_event_Main_TopPanelButtonSettings(lv_event_t * e);
 lv_obj_t * ui_Main_TopPanelButtonSettings;
 void ui_event_Main_TopPanelButtonTime(lv_event_t * e);
 lv_obj_t * ui_Main_TopPanelButtonTime;
 lv_obj_t * ui_Main_TopPanelTime;
-lv_obj_t * ui_Main_ImgButton2;
+lv_obj_t * ui_Main_TopPanel1;
+lv_obj_t * ui_Main_TopPanelBattery1;
+void ui_event_Main_TopPanelScan1(lv_event_t * e);
+lv_obj_t * ui_Main_TopPanelScan1;
+void ui_event_Main_TopPanelButtonSettings1(lv_event_t * e);
+lv_obj_t * ui_Main_TopPanelButtonSettings1;
+void ui_event_Main_TopPanelButtonTime1(lv_event_t * e);
+lv_obj_t * ui_Main_TopPanelButtonTime1;
+lv_obj_t * ui_Main_TopPanelTime1;
 
 
 // SCREEN: ui_Time
@@ -48,15 +57,18 @@ lv_obj_t * ui_Time_Label1;
 void ui_Settings_screen_init(void);
 void ui_event_Settings(lv_event_t * e);
 lv_obj_t * ui_Settings;
-lv_obj_t * ui_SettingsTopPanel;
-lv_obj_t * ui_SettingsTopPanelBattery;
-void ui_event_SettingsTopPanelButtonTime(lv_event_t * e);
-lv_obj_t * ui_SettingsTopPanelButtonTime;
-lv_obj_t * ui_SettingsTopPanelTime;
-lv_obj_t * ui_Settings_Switch1;
-lv_obj_t * ui_Settings_Switch2;
-lv_obj_t * ui_Settings_Switch3;
-lv_obj_t * ui_Settings_Switch4;
+lv_obj_t * ui_Settings_TabView;
+lv_obj_t * ui_Settings_TabPageScan;
+lv_obj_t * ui_Settings_SwitchScan;
+void ui_event_Settings_CheckboxWL134A(lv_event_t * e);
+lv_obj_t * ui_Settings_CheckboxWL134A;
+void ui_event_Settings_CheckboxP1Design(lv_event_t * e);
+lv_obj_t * ui_Settings_CheckboxP1Design;
+lv_obj_t * ui_Settings_LabelScanResult;
+lv_obj_t * ui_Settings_TabPageAP;
+lv_obj_t * ui_Settings_SwitchAP;
+lv_obj_t * ui_Settings_SwitchWifi;
+lv_obj_t * ui_Settings_SwitchBlueTooth;
 
 
 // SCREEN: ui_SetTime
@@ -85,6 +97,33 @@ lv_obj_t * ui_SetTime_Button2;
 lv_obj_t * ui_Date_RollerDay;
 lv_obj_t * ui_Date_RollerMonth;
 lv_obj_t * ui_Date_RollerYear;
+
+
+// SCREEN: ui_Scan
+void ui_Scan_screen_init(void);
+lv_obj_t * ui_Scan;
+lv_obj_t * ui_Scan_TabView;
+lv_obj_t * ui_Scan_TabScan;
+lv_obj_t * ui_Scan_LabelMain;
+lv_obj_t * ui_Scan_LabelTagID;
+lv_obj_t * ui_Scan_LabelNLISID;
+lv_obj_t * ui_Scan_Label5;
+lv_obj_t * ui_Scan_LabelList;
+lv_obj_t * ui_Scan_Dropdown2;
+lv_obj_t * ui_Scan_TopPanel;
+lv_obj_t * ui_Scan_TopPanelBattery;
+void ui_event_Scan_TopPanelScan(lv_event_t * e);
+lv_obj_t * ui_Scan_TopPanelScan;
+void ui_event_Scan_TopPanelButtonSettings(lv_event_t * e);
+lv_obj_t * ui_Scan_TopPanelButtonSettings;
+void ui_event_Main_TopPanelButtonTime3(lv_event_t * e);
+lv_obj_t * ui_Main_TopPanelButtonTime3;
+lv_obj_t * ui_Scan_TopPanelTime;
+lv_obj_t * ui_Scan_TabDetails;
+lv_obj_t * ui_Scan_Label2;
+lv_obj_t * ui_Scan_DropdownLocation;
+lv_obj_t * ui_Scan_DropdownGroup;
+lv_obj_t * ui_Scan_LabelNmae;
 lv_obj_t * ui____initial_actions0;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
@@ -109,6 +148,10 @@ void ui_event_Main(lv_event_t * e)
     if(event_code == LV_EVENT_SCREEN_LOADED) {
         UI_MAIN_SCREEN_LOAD(e);
     }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_Scan, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Scan_screen_init);
+    }
 }
 void ui_event_Main_Button1(lv_event_t * e)
 {
@@ -116,6 +159,14 @@ void ui_event_Main_Button1(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         btn_event_cb(e);
+    }
+}
+void ui_event_Main_TopPanelScan(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        scanSwitched(e);
     }
 }
 void ui_event_Main_TopPanelButtonSettings(lv_event_t * e)
@@ -127,6 +178,30 @@ void ui_event_Main_TopPanelButtonSettings(lv_event_t * e)
     }
 }
 void ui_event_Main_TopPanelButtonTime(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_Time, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Time_screen_init);
+    }
+}
+void ui_event_Main_TopPanelScan1(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        scanSwitched(e);
+    }
+}
+void ui_event_Main_TopPanelButtonSettings1(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_Time, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Time_screen_init);
+    }
+}
+void ui_event_Main_TopPanelButtonTime1(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
@@ -168,12 +243,21 @@ void ui_event_Settings(lv_event_t * e)
         _ui_screen_change(&ui_Time, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_Time_screen_init);
     }
 }
-void ui_event_SettingsTopPanelButtonTime(lv_event_t * e)
+void ui_event_Settings_CheckboxWL134A(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_Time, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Time_screen_init);
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        _ui_state_modify(ui_Settings_CheckboxP1Design, LV_STATE_CHECKED, _UI_MODIFY_STATE_REMOVE);
+    }
+}
+void ui_event_Settings_CheckboxP1Design(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        _ui_basic_set_property(ui_Settings_CheckboxP1Design, _UI_BASIC_PROPERTY_POSITION_X,  0);
+        _ui_state_modify(ui_Settings_CheckboxWL134A, LV_STATE_CHECKED, _UI_MODIFY_STATE_REMOVE);
     }
 }
 void ui_event_SetTime(lv_event_t * e)
@@ -233,6 +317,30 @@ void ui_event_SetTime_Button2(lv_event_t * e)
         _ui_screen_change(&ui_Time, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Time_screen_init);
     }
 }
+void ui_event_Scan_TopPanelScan(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        scanSwitched(e);
+    }
+}
+void ui_event_Scan_TopPanelButtonSettings(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_Time, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Time_screen_init);
+    }
+}
+void ui_event_Main_TopPanelButtonTime3(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_Time, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Time_screen_init);
+    }
+}
 
 ///////////////////// SCREENS ////////////////////
 
@@ -247,6 +355,7 @@ void ui_init(void)
     ui_Settings_screen_init();
     ui_SetTime_screen_init();
     ui_SetDate_screen_init();
+    ui_Scan_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_Main);
 }

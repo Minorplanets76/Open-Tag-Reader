@@ -14,3 +14,19 @@ def setDateManual(event_struct):
 def UI_MAIN_SCREEN_LOAD(event_struct):
     return
 
+
+def TopPanelScanChecked(event_struct):
+    return
+
+
+def TopPanelScanUnchecked(event_struct):
+    return
+
+
+def TopPanelScanPressed(event_struct):
+    return
+
+
+def scanSwitched(event_struct):
+    return
+
