@@ -8,7 +8,7 @@ Respository for Open Source Tag Reader. Built in response to [mandatory introduc
 ## Stick Reader
 Simple stick reader to point at ear tag to read.  Ability to store tag numbers in a scanning session, and to compare to pre-set list (eg identify culls).
 
-Stick reader consists of a RFID reader board and a user interface. A piece of PVC electrical conduit holds it all together.  I chose that because it fits the components and my hand well.  It's bigger than it needs to be but I figured it may get misused as a whacking stick, so needs to be strong.  I haven't given too much thought to dust/water ingress at the prototype stage.  I'm experimenting with different variants, including extendable versions.
+Stick reader consists of a RFID reader board and a user interface. A piece of PVC electrical conduit holds it all together.  I haven't given too much thought to dust/water ingress at the prototype stage.  I'm experimenting with different variants, including extendable versions.
 
 ### RFID Reader Board
 I have tested two differnt reader solutions and both seem to work OK, but need extensive testing.
@@ -21,7 +21,7 @@ The second is the WL-134A board that I found on [Aliexpress](https://www.aliexpr
 The antenna wire is diabolically fine, so I designed up a carrier that holds the board and antenna, ensuring things don't move around, and fits to the chosen conduit.
 
 ### User Interface
-As is often the case, the software has suffered some feature creep! I have been trialing ESP32 and screen combinations from [lilygo.cc](https://www.lilygo.cc/) namely the [T-Embed](https://www.lilygo.cc/products/t-embed) and the [T-Display AMOLED Touch](https://www.lilygo.cc/products/t-display-s3-amoled). They have their pros and cons, so I have made two versions and am testing to see how they fair in the sheepyards.  Everything has/is been put together through PlatformIO and VScode with the Arduino framework.  This has been a learning experience for me.
+As is often the case, the software has suffered some feature creep! I have been trialing ESP32 and screen combinations from [lilygo.cc](https://www.lilygo.cc/) namely the [T-Embed](https://www.lilygo.cc/products/t-embed) and the [T-Display AMOLED Touch](https://www.lilygo.cc/products/t-display-s3-amoled). They have their pros and cons, so I have made two versions and am testing to see how they fare in the sheepyards.  Everything has/is been put together through PlatformIO and VScode with the Arduino framework.  This has been a learning experience for me.
 
 Basic functionality is to scan tags and add to lists, or scan and indicate if on the selected list.  I also plan to add treatment and trait information.  I think I will expand the interface so that a lot of this can be done through a tablet or phone via a wifi access point.
 
