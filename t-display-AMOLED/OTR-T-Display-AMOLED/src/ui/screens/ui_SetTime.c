@@ -10,45 +10,58 @@ void ui_SetTime_screen_init(void)
     ui_SetTime = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_SetTime, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_Time_RollerHour = lv_roller_create(ui_SetTime);
+    ui_SetTime_TabView = lv_tabview_create(ui_SetTime, LV_DIR_BOTTOM, 100);
+    lv_obj_set_width(ui_SetTime_TabView, lv_pct(100));
+    lv_obj_set_height(ui_SetTime_TabView, lv_pct(100));
+    lv_obj_set_align(ui_SetTime_TabView, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_SetTime_TabView, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_text_font(ui_SetTime_TabView, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+
+    ui_SetTime_TabPageTime = lv_tabview_add_tab(ui_SetTime_TabView, "TIME");
+    lv_obj_set_style_text_font(ui_SetTime_TabPageTime, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Time_RollerHour = lv_roller_create(ui_SetTime_TabPageTime);
     lv_roller_set_options(ui_Time_RollerHour, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12", LV_ROLLER_MODE_INFINITE);
-    lv_obj_set_width(ui_Time_RollerHour, lv_pct(33));
-    lv_obj_set_height(ui_Time_RollerHour, lv_pct(50));
-    lv_obj_set_x(ui_Time_RollerHour, lv_pct(-34));
-    lv_obj_set_y(ui_Time_RollerHour, lv_pct(0));
+    lv_obj_set_width(ui_Time_RollerHour, lv_pct(36));
+    lv_obj_set_height(ui_Time_RollerHour, lv_pct(60));
+    lv_obj_set_x(ui_Time_RollerHour, lv_pct(-36));
+    lv_obj_set_y(ui_Time_RollerHour, lv_pct(5));
     lv_obj_set_align(ui_Time_RollerHour, LV_ALIGN_CENTER);
     lv_obj_set_style_text_font(ui_Time_RollerHour, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_set_style_text_font(ui_Time_RollerHour, &lv_font_montserrat_40, LV_PART_SELECTED | LV_STATE_DEFAULT);
 
-    ui_Time_RollerMinute = lv_roller_create(ui_SetTime);
+    ui_Time_RollerMinute = lv_roller_create(ui_SetTime_TabPageTime);
     lv_roller_set_options(ui_Time_RollerMinute,
                           "00\n01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50\n51\n52\n53\n54\n55\n56\n57\n58\n59",
                           LV_ROLLER_MODE_INFINITE);
     lv_roller_set_selected(ui_Time_RollerMinute, 59, LV_ANIM_OFF);
-    lv_obj_set_width(ui_Time_RollerMinute, lv_pct(33));
-    lv_obj_set_height(ui_Time_RollerMinute, lv_pct(50));
+    lv_obj_set_width(ui_Time_RollerMinute, lv_pct(36));
+    lv_obj_set_height(ui_Time_RollerMinute, lv_pct(60));
+    lv_obj_set_x(ui_Time_RollerMinute, lv_pct(0));
+    lv_obj_set_y(ui_Time_RollerMinute, lv_pct(5));
     lv_obj_set_align(ui_Time_RollerMinute, LV_ALIGN_CENTER);
     lv_obj_set_style_text_font(ui_Time_RollerMinute, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_set_style_text_font(ui_Time_RollerMinute, &lv_font_montserrat_40, LV_PART_SELECTED | LV_STATE_DEFAULT);
 
-    ui_Time_RollerAMPM = lv_roller_create(ui_SetTime);
+    ui_Time_RollerAMPM = lv_roller_create(ui_SetTime_TabPageTime);
     lv_roller_set_options(ui_Time_RollerAMPM, "AM\nPM", LV_ROLLER_MODE_NORMAL);
-    lv_obj_set_width(ui_Time_RollerAMPM, lv_pct(33));
-    lv_obj_set_height(ui_Time_RollerAMPM, lv_pct(30));
-    lv_obj_set_x(ui_Time_RollerAMPM, lv_pct(34));
-    lv_obj_set_y(ui_Time_RollerAMPM, lv_pct(0));
+    lv_obj_set_width(ui_Time_RollerAMPM, lv_pct(36));
+    lv_obj_set_height(ui_Time_RollerAMPM, lv_pct(40));
+    lv_obj_set_x(ui_Time_RollerAMPM, lv_pct(36));
+    lv_obj_set_y(ui_Time_RollerAMPM, lv_pct(5));
     lv_obj_set_align(ui_Time_RollerAMPM, LV_ALIGN_CENTER);
     lv_obj_set_style_text_font(ui_Time_RollerAMPM, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_set_style_text_font(ui_Time_RollerAMPM, &lv_font_montserrat_40, LV_PART_SELECTED | LV_STATE_DEFAULT);
 
-    ui_SetTime_ButtonManual = lv_btn_create(ui_SetTime);
+    ui_SetTime_ButtonManual = lv_btn_create(ui_SetTime_TabPageTime);
     lv_obj_set_width(ui_SetTime_ButtonManual, lv_pct(70));
-    lv_obj_set_height(ui_SetTime_ButtonManual, lv_pct(15));
+    lv_obj_set_height(ui_SetTime_ButtonManual, lv_pct(20));
     lv_obj_set_x(ui_SetTime_ButtonManual, lv_pct(0));
-    lv_obj_set_y(ui_SetTime_ButtonManual, lv_pct(35));
+    lv_obj_set_y(ui_SetTime_ButtonManual, lv_pct(-40));
     lv_obj_set_align(ui_SetTime_ButtonManual, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_SetTime_ButtonManual, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_SetTime_ButtonManual, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -60,20 +73,65 @@ void ui_SetTime_screen_init(void)
     lv_label_set_text(ui_SetTime_Label5, "SET");
     lv_obj_set_style_text_font(ui_SetTime_Label5, &lv_font_montserrat_40, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_SetTime_Button5 = lv_btn_create(ui_SetTime);
-    lv_obj_set_width(ui_SetTime_Button5, 75);
-    lv_obj_set_height(ui_SetTime_Button5, 75);
-    lv_obj_set_x(ui_SetTime_Button5, 73);
-    lv_obj_set_y(ui_SetTime_Button5, -216);
-    lv_obj_set_align(ui_SetTime_Button5, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_SetTime_Button5, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_SetTime_Button5, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_img_src(ui_SetTime_Button5, &ui_img_arrow_back_png, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_recolor(ui_SetTime_Button5, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_recolor_opa(ui_SetTime_Button5, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_SetTime_TabPageDate = lv_tabview_add_tab(ui_SetTime_TabView, "DATE");
+    lv_obj_add_state(ui_SetTime_TabPageDate, LV_STATE_FOCUSED);       /// States
+    lv_obj_set_style_text_font(ui_SetTime_TabPageDate, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Date_RollerDay = lv_roller_create(ui_SetTime_TabPageDate);
+    lv_roller_set_options(ui_Date_RollerDay,
+                          "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31",
+                          LV_ROLLER_MODE_INFINITE);
+    lv_obj_set_width(ui_Date_RollerDay, lv_pct(36));
+    lv_obj_set_height(ui_Date_RollerDay, lv_pct(60));
+    lv_obj_set_x(ui_Date_RollerDay, lv_pct(-36));
+    lv_obj_set_y(ui_Date_RollerDay, lv_pct(5));
+    lv_obj_set_align(ui_Date_RollerDay, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_font(ui_Date_RollerDay, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(ui_Date_RollerDay, &lv_font_montserrat_40, LV_PART_SELECTED | LV_STATE_DEFAULT);
+
+    ui_Date_RollerMonth = lv_roller_create(ui_SetTime_TabPageDate);
+    lv_roller_set_options(ui_Date_RollerMonth, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12", LV_ROLLER_MODE_INFINITE);
+    lv_obj_set_width(ui_Date_RollerMonth, lv_pct(36));
+    lv_obj_set_height(ui_Date_RollerMonth, lv_pct(60));
+    lv_obj_set_x(ui_Date_RollerMonth, lv_pct(0));
+    lv_obj_set_y(ui_Date_RollerMonth, lv_pct(5));
+    lv_obj_set_align(ui_Date_RollerMonth, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_font(ui_Date_RollerMonth, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(ui_Date_RollerMonth, &lv_font_montserrat_40, LV_PART_SELECTED | LV_STATE_DEFAULT);
+
+    ui_Date_RollerYear = lv_roller_create(ui_SetTime_TabPageDate);
+    lv_roller_set_options(ui_Date_RollerYear,
+                          "19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40", LV_ROLLER_MODE_NORMAL);
+    lv_obj_set_width(ui_Date_RollerYear, lv_pct(36));
+    lv_obj_set_height(ui_Date_RollerYear, lv_pct(60));
+    lv_obj_set_x(ui_Date_RollerYear, lv_pct(36));
+    lv_obj_set_y(ui_Date_RollerYear, lv_pct(5));
+    lv_obj_set_align(ui_Date_RollerYear, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_font(ui_Date_RollerYear, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(ui_Date_RollerYear, &lv_font_montserrat_40, LV_PART_SELECTED | LV_STATE_DEFAULT);
+
+    ui_SetTime_ButtonManualDate = lv_btn_create(ui_SetTime_TabPageDate);
+    lv_obj_set_width(ui_SetTime_ButtonManualDate, lv_pct(70));
+    lv_obj_set_height(ui_SetTime_ButtonManualDate, lv_pct(20));
+    lv_obj_set_x(ui_SetTime_ButtonManualDate, lv_pct(0));
+    lv_obj_set_y(ui_SetTime_ButtonManualDate, lv_pct(-40));
+    lv_obj_set_align(ui_SetTime_ButtonManualDate, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SetTime_ButtonManualDate, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_SetTime_ButtonManualDate, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_SetTime_Label2 = lv_label_create(ui_SetTime_ButtonManualDate);
+    lv_obj_set_width(ui_SetTime_Label2, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_SetTime_Label2, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_SetTime_Label2, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_SetTime_Label2, "SET");
+    lv_obj_set_style_text_font(ui_SetTime_Label2, &lv_font_montserrat_40, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_SetTime_ButtonManual, ui_event_SetTime_ButtonManual, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_SetTime_Button5, ui_event_SetTime_Button5, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_SetTime_ButtonManualDate, ui_event_SetTime_ButtonManualDate, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_SetTime_TabView, ui_event_SetTime_TabView, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SetTime, ui_event_SetTime, LV_EVENT_ALL, NULL);
 
 }

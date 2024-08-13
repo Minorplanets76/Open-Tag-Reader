@@ -43,24 +43,24 @@ void setTimeManual(lv_event_t * e)
         DateTime now = rtc.now();
         rtc.adjust(DateTime(now.year(), now.month(), now.day(), hour, minute, 0));
 
-        Serial.print("Hour: ");
-        Serial.println(hour);
-        Serial.print("Minute: ");
-        Serial.println(minute);
-        Serial.print("AMPM: ");
-        Serial.println(AMPM);
         
 }
 
 void setDateManual(lv_event_t * e)
 {
-	// Your code here
+        int day = lv_roller_get_selected(ui_Date_RollerDay) +1;
+        int month = lv_roller_get_selected(ui_Date_RollerMonth) +1;
+        int year = lv_roller_get_selected(ui_Date_RollerYear)+2019;
+
+        DateTime now = rtc.now();
+        rtc.adjust(DateTime(year, month, day, now.hour(), now.minute(), now.second()));
+	
 }
 
 void UI_MAIN_SCREEN_LOAD(lv_event_t * e)
 {
-	//updateTimeToScreen();
-        //updateBatteryImage();
+	// updateTimeToScreen();
+        // updateBatteryImage();
 }
 
 
@@ -68,4 +68,82 @@ void UI_MAIN_SCREEN_LOAD(lv_event_t * e)
 void scanSwitched(lv_event_t * e)
 {
 	reader.toggle();
+}
+
+void timeSetScreenLoad(lv_event_t * e)
+{
+	//Set Rollers to current time
+        DateTime now = rtc.now();
+        if (now.hour() > 12) {
+            _ui_roller_set_property(ui_Time_RollerHour, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.hour()-13);
+            _ui_roller_set_property(ui_Time_RollerAMPM, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, 1);
+        }
+        else {
+            _ui_roller_set_property(ui_Time_RollerHour, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.hour()-1);
+            _ui_roller_set_property(ui_Time_RollerAMPM, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, 0);
+        }
+        
+        _ui_roller_set_property(ui_Time_RollerMinute, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.minute());
+        _ui_roller_set_property(ui_Date_RollerDay, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.day()-1);
+        _ui_roller_set_property(ui_Date_RollerMonth, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.month()-1);
+        _ui_roller_set_property(ui_Date_RollerYear, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.year()-2019);
+
+
+}
+
+
+
+
+
+
+void setTimeTabChange(lv_event_t * e)
+{
+	DateTime now = rtc.now();
+        if(lv_tabview_get_tab_act(ui_SetTime_TabView)) {
+                //date screen
+                _ui_roller_set_property(ui_Time_RollerMinute, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.minute());
+                _ui_roller_set_property(ui_Date_RollerDay, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.day()-1);
+                _ui_roller_set_property(ui_Date_RollerMonth, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.month()-1);
+                _ui_roller_set_property(ui_Date_RollerYear, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.year()-2019);
+        }
+        else {
+                //time screen
+                if (now.hour() > 12) {
+                _ui_roller_set_property(ui_Time_RollerHour, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.hour()-13);
+                _ui_roller_set_property(ui_Time_RollerAMPM, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, 1);
+                }
+                else {
+                _ui_roller_set_property(ui_Time_RollerHour, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.hour()-1);
+                _ui_roller_set_property(ui_Time_RollerAMPM, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, 0);
+                }
+                _ui_roller_set_property(ui_Time_RollerMinute, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.minute());
+        }
+       
+}
+void timeScreenLoaded(lv_event_t * e)
+{
+    char timeClock[5];
+    DateTime now = rtc.now();
+    if (now.isPM()) {
+        sprintf(timeClock, "%d:%02d", now.hour() - 12, now.minute());
+        lv_label_set_text_fmt(ui_Time_Label_Time, "%s PM", timeClock);
+    } else {
+        sprintf(timeClock, "%d:%02d", now.hour(), now.minute());
+        lv_label_set_text_fmt(ui_Time_Label_Time, "%s AM", timeClock);
+    }
+    updateDateToScreen();
+}
+
+void SetTimeScreenLoaded(lv_event_t * e)
+{
+	DateTime now = rtc.now();
+        if (now.hour() > 12) {
+            _ui_roller_set_property(ui_Time_RollerHour, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.hour()-13);
+            _ui_roller_set_property(ui_Time_RollerAMPM, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, 1);
+        }
+        else {
+            _ui_roller_set_property(ui_Time_RollerHour, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.hour()-1);
+            _ui_roller_set_property(ui_Time_RollerAMPM, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, 0);
+        }
+        _ui_roller_set_property(ui_Time_RollerMinute, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.minute());
 }

@@ -30,3 +30,27 @@ def TopPanelScanPressed(event_struct):
 def scanSwitched(event_struct):
     return
 
+
+def timeSetScreenLoad(event_struct):
+    return
+
+
+def timeTabSelected(event_struct):
+    return
+
+
+def dateTabSelected(event_struct):
+    return
+
+
+def timeScreenLoaded(event_struct):
+    return
+
+
+def setTimeTabChange(event_struct):
+    return
+
+
+def SetTimeScreenLoaded(event_struct):
+    return
+

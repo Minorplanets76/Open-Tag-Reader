@@ -98,7 +98,7 @@ void WL_134A_RFID:: readPacket()   {
     }
     Serial.println(reading.countryID);
     reading.isAnimal = hex_to_uint64(packet[rfid_packet_animal]);
-    Serial.print(" Is Animal: ");
+    Serial.print("Is Animal: ");
     Serial.println(reading.isAnimal);
     snprintf(reading.rfidID, sizeof(reading.rfidID), "%03u %012llu", reading.countryID, reading.tagID);
     Serial.print("RFID ID: ");

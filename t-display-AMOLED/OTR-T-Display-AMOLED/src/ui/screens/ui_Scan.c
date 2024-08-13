@@ -12,19 +12,23 @@ void ui_Scan_screen_init(void)
 
     ui_Scan_TabView = lv_tabview_create(ui_Scan, LV_DIR_BOTTOM, 100);
     lv_obj_set_width(ui_Scan_TabView, lv_pct(100));
-    lv_obj_set_height(ui_Scan_TabView, lv_pct(100));
+    lv_obj_set_height(ui_Scan_TabView, lv_pct(90));
+    lv_obj_set_x(ui_Scan_TabView, lv_pct(0));
+    lv_obj_set_y(ui_Scan_TabView, lv_pct(5));
     lv_obj_set_align(ui_Scan_TabView, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_Scan_TabView, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_text_font(ui_Scan_TabView, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 
     ui_Scan_TabScan = lv_tabview_add_tab(ui_Scan_TabView, "SCAN");
+    lv_obj_set_style_bg_color(ui_Scan_TabScan, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Scan_TabScan, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Scan_LabelMain = lv_label_create(ui_Scan_TabScan);
-    lv_obj_set_width(ui_Scan_LabelMain, lv_pct(90));
-    lv_obj_set_height(ui_Scan_LabelMain, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_width(ui_Scan_LabelMain, lv_pct(100));
+    lv_obj_set_height(ui_Scan_LabelMain, lv_pct(30));
     lv_obj_set_x(ui_Scan_LabelMain, 0);
-    lv_obj_set_y(ui_Scan_LabelMain, lv_pct(20));
+    lv_obj_set_y(ui_Scan_LabelMain, lv_pct(25));
     lv_obj_set_align(ui_Scan_LabelMain, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Scan_LabelMain, "CHAD 150");
     lv_label_set_recolor(ui_Scan_LabelMain, "true");
@@ -40,57 +44,199 @@ void ui_Scan_screen_init(void)
     lv_obj_set_width(ui_Scan_LabelTagID, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Scan_LabelTagID, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_Scan_LabelTagID, lv_pct(0));
-    lv_obj_set_y(ui_Scan_LabelTagID, lv_pct(10));
+    lv_obj_set_y(ui_Scan_LabelTagID, lv_pct(-2));
     lv_obj_set_align(ui_Scan_LabelTagID, LV_ALIGN_TOP_MID);
     lv_label_set_text(ui_Scan_LabelTagID, "###_############");
     lv_obj_set_style_text_font(ui_Scan_LabelTagID, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_Scan_LabelNLISID = lv_label_create(ui_Scan_TabScan);
-    lv_obj_set_width(ui_Scan_LabelNLISID, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Scan_LabelNLISID, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Scan_LabelNLISID, lv_pct(0));
-    lv_obj_set_y(ui_Scan_LabelNLISID, lv_pct(18));
-    lv_obj_set_align(ui_Scan_LabelNLISID, LV_ALIGN_TOP_MID);
-    lv_label_set_text(ui_Scan_LabelNLISID, "################");
-    lv_obj_set_style_text_font(ui_Scan_LabelNLISID, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Scan_Label5 = lv_label_create(ui_Scan_TabScan);
     lv_obj_set_width(ui_Scan_Label5, lv_pct(90));
     lv_obj_set_height(ui_Scan_Label5, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_Scan_Label5, lv_pct(-1));
-    lv_obj_set_y(ui_Scan_Label5, lv_pct(-20));
+    lv_obj_set_y(ui_Scan_Label5, lv_pct(-30));
     lv_obj_set_align(ui_Scan_Label5, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Scan_Label5, "Scan Mode:");
     lv_label_set_recolor(ui_Scan_Label5, "true");
     lv_obj_set_style_text_align(ui_Scan_Label5, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_Scan_Label5, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Scan_LabelList = lv_label_create(ui_Scan_TabScan);
-    lv_obj_set_width(ui_Scan_LabelList, lv_pct(100));
-    lv_obj_set_height(ui_Scan_LabelList, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Scan_LabelList, lv_pct(1));
-    lv_obj_set_y(ui_Scan_LabelList, lv_pct(2));
-    lv_obj_set_align(ui_Scan_LabelList, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(ui_Scan_LabelList, LV_LABEL_LONG_SCROLL);
-    lv_label_set_text(ui_Scan_LabelList, "Group:");
-    lv_obj_set_style_text_font(ui_Scan_LabelList, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_Scan_DropdownMode = lv_dropdown_create(ui_Scan_TabScan);
+    lv_dropdown_set_options(ui_Scan_DropdownMode, "Standard\nCount\nDraft");
+    lv_obj_set_width(ui_Scan_DropdownMode, lv_pct(100));
+    lv_obj_set_height(ui_Scan_DropdownMode, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_DropdownMode, lv_pct(0));
+    lv_obj_set_y(ui_Scan_DropdownMode, lv_pct(-18));
+    lv_obj_set_align(ui_Scan_DropdownMode, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Scan_DropdownMode, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
 
-    ui_Scan_Dropdown2 = lv_dropdown_create(ui_Scan_TabScan);
-    lv_dropdown_set_options(ui_Scan_Dropdown2, "Simple\nCount\nFind");
-    lv_obj_set_width(ui_Scan_Dropdown2, lv_pct(100));
-    lv_obj_set_height(ui_Scan_Dropdown2, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Scan_Dropdown2, lv_pct(1));
-    lv_obj_set_y(ui_Scan_Dropdown2, lv_pct(-8));
-    lv_obj_set_align(ui_Scan_Dropdown2, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Scan_Dropdown2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_Scan_DropdownMode), &lv_font_montserrat_30,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_Gender = lv_label_create(ui_Scan_TabScan);
+    lv_obj_set_width(ui_Scan_Gender, lv_pct(50));
+    lv_obj_set_height(ui_Scan_Gender, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_Gender, lv_pct(-25));
+    lv_obj_set_y(ui_Scan_Gender, lv_pct(-40));
+    lv_obj_set_align(ui_Scan_Gender, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_Scan_Gender, LV_LABEL_LONG_CLIP);
+    lv_label_set_text(ui_Scan_Gender, "Female");
+    lv_obj_set_style_text_align(ui_Scan_Gender, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_Age = lv_label_create(ui_Scan_TabScan);
+    lv_obj_set_width(ui_Scan_Age, lv_pct(50));
+    lv_obj_set_height(ui_Scan_Age, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_Age, lv_pct(25));
+    lv_obj_set_y(ui_Scan_Age, lv_pct(-40));
+    lv_obj_set_align(ui_Scan_Age, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_Scan_Age, LV_LABEL_LONG_CLIP);
+    lv_label_set_text(ui_Scan_Age, "12mths");
+    lv_obj_set_style_text_align(ui_Scan_Age, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_DropdownStatus = lv_dropdown_create(ui_Scan_TabScan);
+    lv_dropdown_set_options(ui_Scan_DropdownStatus, "Alive\nDead\nSold");
+    lv_obj_set_width(ui_Scan_DropdownStatus, lv_pct(100));
+    lv_obj_set_height(ui_Scan_DropdownStatus, LV_SIZE_CONTENT);    /// 8
+    lv_obj_set_x(ui_Scan_DropdownStatus, lv_pct(0));
+    lv_obj_set_y(ui_Scan_DropdownStatus, lv_pct(-3));
+    lv_obj_set_align(ui_Scan_DropdownStatus, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Scan_DropdownStatus, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_text_font(ui_Scan_DropdownStatus, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_Scan_DropdownStatus), &lv_font_montserrat_30,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_TabDetails = lv_tabview_add_tab(ui_Scan_TabView, "MORE");
+    lv_obj_set_style_pad_left(ui_Scan_TabDetails, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_Scan_TabDetails, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_Scan_TabDetails, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_Scan_TabDetails, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_TabView2 = lv_tabview_create(ui_Scan_TabDetails, LV_DIR_TOP, 50);
+    lv_obj_set_width(ui_Scan_TabView2, lv_pct(100));
+    lv_obj_set_height(ui_Scan_TabView2, lv_pct(100));
+    lv_obj_set_align(ui_Scan_TabView2, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_Scan_TabView2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_pad_left(ui_Scan_TabView2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui_Scan_TabView2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui_Scan_TabView2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui_Scan_TabView2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_tabview_get_tab_btns(ui_Scan_TabView2), &lv_font_montserrat_24,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_TabDetails = lv_tabview_add_tab(ui_Scan_TabView2, "Detail");
+
+    ui_Scan_LabelNmae = lv_label_create(ui_Scan_TabDetails);
+    lv_obj_set_width(ui_Scan_LabelNmae, lv_pct(100));
+    lv_obj_set_height(ui_Scan_LabelNmae, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_LabelNmae, lv_pct(0));
+    lv_obj_set_y(ui_Scan_LabelNmae, lv_pct(-45));
+    lv_obj_set_align(ui_Scan_LabelNmae, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(ui_Scan_LabelNmae, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_text(ui_Scan_LabelNmae, "Ronaldo");
+    lv_obj_set_style_text_align(ui_Scan_LabelNmae, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_Scan_LabelNmae, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_LabelVisualID = lv_label_create(ui_Scan_TabDetails);
+    lv_obj_set_width(ui_Scan_LabelVisualID, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Scan_LabelVisualID, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_LabelVisualID, lv_pct(0));
+    lv_obj_set_y(ui_Scan_LabelVisualID, lv_pct(-30));
+    lv_obj_set_align(ui_Scan_LabelVisualID, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Scan_LabelVisualID, "CHAD 001");
+    lv_label_set_recolor(ui_Scan_LabelVisualID, "true");
+    lv_obj_set_style_text_font(ui_Scan_LabelVisualID, &lv_font_montserrat_42, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_Scan_LabelVisualID, lv_color_hex(0x807D7D), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Scan_LabelVisualID, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_DropdownLocation = lv_dropdown_create(ui_Scan_TabDetails);
+    lv_dropdown_set_options(ui_Scan_DropdownLocation, "Dorethea\nBellevue");
+    lv_obj_set_width(ui_Scan_DropdownLocation, lv_pct(100));
+    lv_obj_set_height(ui_Scan_DropdownLocation, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_DropdownLocation, lv_pct(0));
+    lv_obj_set_y(ui_Scan_DropdownLocation, lv_pct(-10));
+    lv_obj_set_align(ui_Scan_DropdownLocation, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Scan_DropdownLocation, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_text_font(ui_Scan_DropdownLocation, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_Scan_DropdownLocation), &lv_font_montserrat_30,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_DropdownGroup = lv_dropdown_create(ui_Scan_TabDetails);
+    lv_dropdown_set_options(ui_Scan_DropdownGroup, "Ewes\nMaidens\nLambs\nRams");
+    lv_obj_set_width(ui_Scan_DropdownGroup, lv_pct(100));
+    lv_obj_set_height(ui_Scan_DropdownGroup, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_DropdownGroup, lv_pct(0));
+    lv_obj_set_y(ui_Scan_DropdownGroup, lv_pct(10));
+    lv_obj_set_align(ui_Scan_DropdownGroup, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Scan_DropdownGroup, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_text_font(ui_Scan_DropdownGroup, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_Scan_DropdownGroup), &lv_font_montserrat_30,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_Scan_Comments = lv_textarea_create(ui_Scan_TabDetails);
+    lv_obj_set_width(ui_Scan_Comments, lv_pct(100));
+    lv_obj_set_height(ui_Scan_Comments, lv_pct(30));
+    lv_obj_set_x(ui_Scan_Comments, lv_pct(0));
+    lv_obj_set_y(ui_Scan_Comments, lv_pct(35));
+    lv_obj_set_align(ui_Scan_Comments, LV_ALIGN_CENTER);
+    lv_textarea_set_placeholder_text(ui_Scan_Comments, "Placeholder...");
+    lv_obj_set_style_text_font(ui_Scan_Comments, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 
 
-    ui_Scan_TopPanel = lv_obj_create(ui_Scan_TabScan);
-    lv_obj_set_width(ui_Scan_TopPanel, lv_pct(108));
-    lv_obj_set_height(ui_Scan_TopPanel, lv_pct(12));
+    ui_Scan_TabTreat = lv_tabview_add_tab(ui_Scan_TabView2, "Treat");
+
+    ui_Scan_Treatment = lv_dropdown_create(ui_Scan_TabTreat);
+    lv_dropdown_set_options(ui_Scan_Treatment, "\nDrench\nVaccinate\nExternal\nHooves\nShear/Crutch");
+    lv_obj_set_width(ui_Scan_Treatment, lv_pct(100));
+    lv_obj_set_height(ui_Scan_Treatment, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_Treatment, lv_pct(0));
+    lv_obj_set_y(ui_Scan_Treatment, lv_pct(-40));
+    lv_obj_set_align(ui_Scan_Treatment, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Scan_Treatment, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+
+
+
+    ui_Scan_Product = lv_dropdown_create(ui_Scan_TabTreat);
+    lv_dropdown_set_options(ui_Scan_Product, "\nTridectin\nGlanvac 6-1");
+    lv_obj_set_width(ui_Scan_Product, lv_pct(100));
+    lv_obj_set_height(ui_Scan_Product, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_Product, lv_pct(0));
+    lv_obj_set_y(ui_Scan_Product, lv_pct(-20));
+    lv_obj_set_align(ui_Scan_Product, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Scan_Product, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+
+
+
+    ui_Scan_Dose = lv_dropdown_create(ui_Scan_TabTreat);
+    lv_dropdown_set_options(ui_Scan_Dose, "\n1mL\n5mL\n7mL\n8mL\n9mL\n12mL\n13mL\n14mL\n15mL");
+    lv_obj_set_width(ui_Scan_Dose, lv_pct(100));
+    lv_obj_set_height(ui_Scan_Dose, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_Scan_Dose, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Scan_Dose, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+
+
+
+    ui_Scan_Human = lv_dropdown_create(ui_Scan_TabTreat);
+    lv_dropdown_set_options(ui_Scan_Human, "CC\nOC");
+    lv_obj_set_width(ui_Scan_Human, lv_pct(100));
+    lv_obj_set_height(ui_Scan_Human, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Scan_Human, lv_pct(0));
+    lv_obj_set_y(ui_Scan_Human, lv_pct(20));
+    lv_obj_set_align(ui_Scan_Human, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Scan_Human, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+
+
+
+    ui_Scan_TabTrait = lv_tabview_add_tab(ui_Scan_TabView2, "Trait");
+
+    ui_Scan_TopPanel = lv_obj_create(ui_Scan);
+    lv_obj_set_width(ui_Scan_TopPanel, lv_pct(100));
+    lv_obj_set_height(ui_Scan_TopPanel, lv_pct(10));
     lv_obj_set_x(ui_Scan_TopPanel, lv_pct(0));
-    lv_obj_set_y(ui_Scan_TopPanel, lv_pct(-47));
+    lv_obj_set_y(ui_Scan_TopPanel, lv_pct(-45));
     lv_obj_set_align(ui_Scan_TopPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_Scan_TopPanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
@@ -126,20 +272,20 @@ void ui_Scan_screen_init(void)
     lv_obj_set_y(ui_Scan_TopPanelButtonSettings, lv_pct(0));
     lv_obj_set_align(ui_Scan_TopPanelButtonSettings, LV_ALIGN_CENTER);
 
-    ui_Main_TopPanelButtonTime3 = lv_btn_create(ui_Scan_TopPanel);
-    lv_obj_set_height(ui_Main_TopPanelButtonTime3, 48);
-    lv_obj_set_width(ui_Main_TopPanelButtonTime3, lv_pct(40));
-    lv_obj_set_x(ui_Main_TopPanelButtonTime3, lv_pct(35));
-    lv_obj_set_y(ui_Main_TopPanelButtonTime3, lv_pct(0));
-    lv_obj_set_align(ui_Main_TopPanelButtonTime3, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Main_TopPanelButtonTime3, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_Main_TopPanelButtonTime3, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_Main_TopPanelButtonTime3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_Main_TopPanelButtonTime3, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui_Main_TopPanelButtonTime3, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_spread(ui_Main_TopPanelButtonTime3, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_Scan_TopPanelButtonTime = lv_btn_create(ui_Scan_TopPanel);
+    lv_obj_set_height(ui_Scan_TopPanelButtonTime, 48);
+    lv_obj_set_width(ui_Scan_TopPanelButtonTime, lv_pct(40));
+    lv_obj_set_x(ui_Scan_TopPanelButtonTime, lv_pct(35));
+    lv_obj_set_y(ui_Scan_TopPanelButtonTime, lv_pct(0));
+    lv_obj_set_align(ui_Scan_TopPanelButtonTime, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Scan_TopPanelButtonTime, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_Scan_TopPanelButtonTime, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_Scan_TopPanelButtonTime, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Scan_TopPanelButtonTime, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui_Scan_TopPanelButtonTime, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_spread(ui_Scan_TopPanelButtonTime, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Scan_TopPanelTime = lv_label_create(ui_Main_TopPanelButtonTime3);
+    ui_Scan_TopPanelTime = lv_label_create(ui_Scan_TopPanelButtonTime);
     lv_obj_set_width(ui_Scan_TopPanelTime, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Scan_TopPanelTime, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_Scan_TopPanelTime, LV_ALIGN_CENTER);
@@ -148,58 +294,8 @@ void ui_Scan_screen_init(void)
     lv_obj_set_style_text_opa(ui_Scan_TopPanelTime, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_Scan_TopPanelTime, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Scan_TabDetails = lv_tabview_add_tab(ui_Scan_TabView, "DETAILS");
-
-    ui_Scan_Label2 = lv_label_create(ui_Scan_TabDetails);
-    lv_obj_set_width(ui_Scan_Label2, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Scan_Label2, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Scan_Label2, 0);
-    lv_obj_set_y(ui_Scan_Label2, lv_pct(-45));
-    lv_obj_set_align(ui_Scan_Label2, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Scan_Label2, "CHAD 001");
-    lv_label_set_recolor(ui_Scan_Label2, "true");
-    lv_obj_set_style_text_font(ui_Scan_Label2, &lv_font_montserrat_42, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_Scan_Label2, lv_color_hex(0x807D7D), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_Scan_Label2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_Scan_DropdownLocation = lv_dropdown_create(ui_Scan_TabDetails);
-    lv_dropdown_set_options(ui_Scan_DropdownLocation, "Dorethea\nBellevue");
-    lv_obj_set_width(ui_Scan_DropdownLocation, lv_pct(100));
-    lv_obj_set_height(ui_Scan_DropdownLocation, lv_pct(11));
-    lv_obj_set_x(ui_Scan_DropdownLocation, lv_pct(0));
-    lv_obj_set_y(ui_Scan_DropdownLocation, lv_pct(-13));
-    lv_obj_set_align(ui_Scan_DropdownLocation, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Scan_DropdownLocation, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_set_style_text_font(ui_Scan_DropdownLocation, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_Scan_DropdownLocation), &lv_font_montserrat_30,
-                               LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_Scan_DropdownGroup = lv_dropdown_create(ui_Scan_TabDetails);
-    lv_dropdown_set_options(ui_Scan_DropdownGroup, "Ewes\nMaidens\nLambs\nRams");
-    lv_obj_set_width(ui_Scan_DropdownGroup, lv_pct(100));
-    lv_obj_set_height(ui_Scan_DropdownGroup, lv_pct(11));
-    lv_obj_set_x(ui_Scan_DropdownGroup, lv_pct(0));
-    lv_obj_set_y(ui_Scan_DropdownGroup, lv_pct(-1));
-    lv_obj_set_align(ui_Scan_DropdownGroup, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Scan_DropdownGroup, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_set_style_text_font(ui_Scan_DropdownGroup, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    lv_obj_set_style_text_font(lv_dropdown_get_list(ui_Scan_DropdownGroup), &lv_font_montserrat_30,
-                               LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_Scan_LabelNmae = lv_label_create(ui_Scan_TabDetails);
-    lv_obj_set_width(ui_Scan_LabelNmae, lv_pct(100));
-    lv_obj_set_height(ui_Scan_LabelNmae, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Scan_LabelNmae, lv_pct(0));
-    lv_obj_set_y(ui_Scan_LabelNmae, lv_pct(-33));
-    lv_obj_set_align(ui_Scan_LabelNmae, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Scan_LabelNmae, "Ronaldo");
-    lv_obj_set_style_text_align(ui_Scan_LabelNmae, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Scan_LabelNmae, &lv_font_montserrat_28, LV_PART_MAIN | LV_STATE_DEFAULT);
-
     lv_obj_add_event_cb(ui_Scan_TopPanelScan, ui_event_Scan_TopPanelScan, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Scan_TopPanelButtonSettings, ui_event_Scan_TopPanelButtonSettings, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_Main_TopPanelButtonTime3, ui_event_Main_TopPanelButtonTime3, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_Scan_TopPanelButtonTime, ui_event_Scan_TopPanelButtonTime, LV_EVENT_ALL, NULL);
 
 }

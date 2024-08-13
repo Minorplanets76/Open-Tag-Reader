@@ -42,15 +42,6 @@ extern lv_obj_t * ui_Main_TopPanelButtonSettings;
 void ui_event_Main_TopPanelButtonTime(lv_event_t * e);
 extern lv_obj_t * ui_Main_TopPanelButtonTime;
 extern lv_obj_t * ui_Main_TopPanelTime;
-extern lv_obj_t * ui_Main_TopPanel1;
-extern lv_obj_t * ui_Main_TopPanelBattery1;
-void ui_event_Main_TopPanelScan1(lv_event_t * e);
-extern lv_obj_t * ui_Main_TopPanelScan1;
-void ui_event_Main_TopPanelButtonSettings1(lv_event_t * e);
-extern lv_obj_t * ui_Main_TopPanelButtonSettings1;
-void ui_event_Main_TopPanelButtonTime1(lv_event_t * e);
-extern lv_obj_t * ui_Main_TopPanelButtonTime1;
-extern lv_obj_t * ui_Main_TopPanelTime1;
 // SCREEN: ui_Time
 void ui_Time_screen_init(void);
 void ui_event_Time(lv_event_t * e);
@@ -58,13 +49,32 @@ extern lv_obj_t * ui_Time;
 extern lv_obj_t * ui_Main_Label3;
 extern lv_obj_t * ui_Time_Label_Date;
 extern lv_obj_t * ui_Time_Label_Time;
-extern lv_obj_t * ui_Time_Label_Date2;
 void ui_event_Time_SetTime(lv_event_t * e);
 extern lv_obj_t * ui_Time_SetTime;
 extern lv_obj_t * ui_Time_Label4;
-void ui_event_Time_SetDate(lv_event_t * e);
-extern lv_obj_t * ui_Time_SetDate;
+void ui_event_Time_Sync(lv_event_t * e);
+extern lv_obj_t * ui_Time_Sync;
 extern lv_obj_t * ui_Time_Label1;
+// SCREEN: ui_SetTime
+void ui_SetTime_screen_init(void);
+void ui_event_SetTime(lv_event_t * e);
+extern lv_obj_t * ui_SetTime;
+void ui_event_SetTime_TabView(lv_event_t * e);
+extern lv_obj_t * ui_SetTime_TabView;
+extern lv_obj_t * ui_SetTime_TabPageTime;
+extern lv_obj_t * ui_Time_RollerHour;
+extern lv_obj_t * ui_Time_RollerMinute;
+extern lv_obj_t * ui_Time_RollerAMPM;
+void ui_event_SetTime_ButtonManual(lv_event_t * e);
+extern lv_obj_t * ui_SetTime_ButtonManual;
+extern lv_obj_t * ui_SetTime_Label5;
+extern lv_obj_t * ui_SetTime_TabPageDate;
+extern lv_obj_t * ui_Date_RollerDay;
+extern lv_obj_t * ui_Date_RollerMonth;
+extern lv_obj_t * ui_Date_RollerYear;
+void ui_event_SetTime_ButtonManualDate(lv_event_t * e);
+extern lv_obj_t * ui_SetTime_ButtonManualDate;
+extern lv_obj_t * ui_SetTime_Label2;
 // SCREEN: ui_Settings
 void ui_Settings_screen_init(void);
 void ui_event_Settings(lv_event_t * e);
@@ -81,30 +91,7 @@ extern lv_obj_t * ui_Settings_TabPageAP;
 extern lv_obj_t * ui_Settings_SwitchAP;
 extern lv_obj_t * ui_Settings_SwitchWifi;
 extern lv_obj_t * ui_Settings_SwitchBlueTooth;
-// SCREEN: ui_SetTime
-void ui_SetTime_screen_init(void);
-void ui_event_SetTime(lv_event_t * e);
-extern lv_obj_t * ui_SetTime;
-extern lv_obj_t * ui_Time_RollerHour;
-extern lv_obj_t * ui_Time_RollerMinute;
-extern lv_obj_t * ui_Time_RollerAMPM;
-void ui_event_SetTime_ButtonManual(lv_event_t * e);
-extern lv_obj_t * ui_SetTime_ButtonManual;
-extern lv_obj_t * ui_SetTime_Label5;
-void ui_event_SetTime_Button5(lv_event_t * e);
-extern lv_obj_t * ui_SetTime_Button5;
-// SCREEN: ui_SetDate
-void ui_SetDate_screen_init(void);
-void ui_event_SetDate(lv_event_t * e);
-extern lv_obj_t * ui_SetDate;
-void ui_event_SetDate_ButtonManual(lv_event_t * e);
-extern lv_obj_t * ui_SetDate_ButtonManual;
-extern lv_obj_t * ui_SetTime_Label2;
-void ui_event_SetTime_Button2(lv_event_t * e);
-extern lv_obj_t * ui_SetTime_Button2;
-extern lv_obj_t * ui_Date_RollerDay;
-extern lv_obj_t * ui_Date_RollerMonth;
-extern lv_obj_t * ui_Date_RollerYear;
+extern lv_obj_t * ui_Settings_ImgButton1;
 // SCREEN: ui_Scan
 void ui_Scan_screen_init(void);
 extern lv_obj_t * ui_Scan;
@@ -112,24 +99,34 @@ extern lv_obj_t * ui_Scan_TabView;
 extern lv_obj_t * ui_Scan_TabScan;
 extern lv_obj_t * ui_Scan_LabelMain;
 extern lv_obj_t * ui_Scan_LabelTagID;
-extern lv_obj_t * ui_Scan_LabelNLISID;
 extern lv_obj_t * ui_Scan_Label5;
-extern lv_obj_t * ui_Scan_LabelList;
-extern lv_obj_t * ui_Scan_Dropdown2;
+extern lv_obj_t * ui_Scan_DropdownMode;
+extern lv_obj_t * ui_Scan_Gender;
+extern lv_obj_t * ui_Scan_Age;
+extern lv_obj_t * ui_Scan_DropdownStatus;
+extern lv_obj_t * ui_Scan_TabDetails;
+extern lv_obj_t * ui_Scan_TabView2;
+extern lv_obj_t * ui_Scan_TabDetails;
+extern lv_obj_t * ui_Scan_LabelNmae;
+extern lv_obj_t * ui_Scan_LabelVisualID;
+extern lv_obj_t * ui_Scan_DropdownLocation;
+extern lv_obj_t * ui_Scan_DropdownGroup;
+extern lv_obj_t * ui_Scan_Comments;
+extern lv_obj_t * ui_Scan_TabTreat;
+extern lv_obj_t * ui_Scan_Treatment;
+extern lv_obj_t * ui_Scan_Product;
+extern lv_obj_t * ui_Scan_Dose;
+extern lv_obj_t * ui_Scan_Human;
+extern lv_obj_t * ui_Scan_TabTrait;
 extern lv_obj_t * ui_Scan_TopPanel;
 extern lv_obj_t * ui_Scan_TopPanelBattery;
 void ui_event_Scan_TopPanelScan(lv_event_t * e);
 extern lv_obj_t * ui_Scan_TopPanelScan;
 void ui_event_Scan_TopPanelButtonSettings(lv_event_t * e);
 extern lv_obj_t * ui_Scan_TopPanelButtonSettings;
-void ui_event_Main_TopPanelButtonTime3(lv_event_t * e);
-extern lv_obj_t * ui_Main_TopPanelButtonTime3;
+void ui_event_Scan_TopPanelButtonTime(lv_event_t * e);
+extern lv_obj_t * ui_Scan_TopPanelButtonTime;
 extern lv_obj_t * ui_Scan_TopPanelTime;
-extern lv_obj_t * ui_Scan_TabDetails;
-extern lv_obj_t * ui_Scan_Label2;
-extern lv_obj_t * ui_Scan_DropdownLocation;
-extern lv_obj_t * ui_Scan_DropdownGroup;
-extern lv_obj_t * ui_Scan_LabelNmae;
 extern lv_obj_t * ui____initial_actions0;
 
 
@@ -143,6 +140,8 @@ LV_IMG_DECLARE(ui_img_wifi_off_png);    // assets/wifi_off.png
 LV_IMG_DECLARE(ui_img_wifi_png);    // assets/wifi.png
 LV_IMG_DECLARE(ui_img_bluetooth_disabled_png);    // assets/bluetooth_disabled.png
 LV_IMG_DECLARE(ui_img_bluetooth_png);    // assets/bluetooth.png
+LV_IMG_DECLARE(ui_img_volume_up_png);    // assets/volume_up.png
+LV_IMG_DECLARE(ui_img_add_circle_png);    // assets/add_circle.png
 LV_IMG_DECLARE(ui_img_arrow_back_png);    // assets/arrow_back.png
 LV_IMG_DECLARE(ui_img_battery_1_bar_png);    // assets/battery_1_bar.png
 LV_IMG_DECLARE(ui_img_battery_2_bar_png);    // assets/battery_2_bar.png
@@ -151,9 +150,10 @@ LV_IMG_DECLARE(ui_img_battery_5_bar_png);    // assets/battery_5_bar.png
 LV_IMG_DECLARE(ui_img_battery_alert_png);    // assets/battery_alert.png
 LV_IMG_DECLARE(ui_img_battery_charging_full_png);    // assets/battery_charging_full.png
 LV_IMG_DECLARE(ui_img_battery_full_png);    // assets/battery_full.png
-LV_IMG_DECLARE(ui_img_sd_card_png);    // assets/sd_card.png
-LV_IMG_DECLARE(ui_img_add_circle_png);    // assets/add_circle.png
 LV_IMG_DECLARE(ui_img_cancel_png);    // assets/cancel.png
+LV_IMG_DECLARE(ui_img_sd_card_png);    // assets/sd_card.png
+LV_IMG_DECLARE(ui_img_volume_down_png);    // assets/volume_down.png
+LV_IMG_DECLARE(ui_img_volume_off_png);    // assets/volume_off.png
 
 
 

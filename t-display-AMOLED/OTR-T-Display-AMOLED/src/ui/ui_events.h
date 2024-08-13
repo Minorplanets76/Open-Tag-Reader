@@ -13,6 +13,9 @@ extern "C" {
 void UI_MAIN_SCREEN_LOAD(lv_event_t * e);
 void btn_event_cb(lv_event_t * e);
 void scanSwitched(lv_event_t * e);
+void timeScreenLoaded(lv_event_t * e);
+void SetTimeScreenLoaded(lv_event_t * e);
+void setTimeTabChange(lv_event_t * e);
 void setTimeManual(lv_event_t * e);
 void setDateManual(lv_event_t * e);
 

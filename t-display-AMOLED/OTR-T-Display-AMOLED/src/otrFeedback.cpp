@@ -68,6 +68,7 @@ void updateBatteryImage() {
     }
     lv_img_set_src(ui_Main_TopPanelBattery, image);
     lv_img_set_src(ui_Scan_TopPanelBattery, image);
+    
 }
 
 // Define a map to store note frequencies based on note names

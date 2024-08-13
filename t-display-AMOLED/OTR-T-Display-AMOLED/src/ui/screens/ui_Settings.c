@@ -26,10 +26,10 @@ void ui_Settings_screen_init(void)
     lv_obj_set_style_text_font(ui_Settings_TabPageScan, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Settings_SwitchScan = lv_switch_create(ui_Settings_TabPageScan);
-    lv_obj_set_width(ui_Settings_SwitchScan, lv_pct(80));
-    lv_obj_set_height(ui_Settings_SwitchScan, lv_pct(25));
+    lv_obj_set_width(ui_Settings_SwitchScan, lv_pct(60));
+    lv_obj_set_height(ui_Settings_SwitchScan, lv_pct(20));
     lv_obj_set_x(ui_Settings_SwitchScan, lv_pct(0));
-    lv_obj_set_y(ui_Settings_SwitchScan, lv_pct(-30));
+    lv_obj_set_y(ui_Settings_SwitchScan, lv_pct(-40));
     lv_obj_set_align(ui_Settings_SwitchScan, LV_ALIGN_CENTER);
 
     lv_obj_set_style_bg_img_src(ui_Settings_SwitchScan, &ui_img_contactless_off_png, LV_PART_KNOB | LV_STATE_DEFAULT);
@@ -68,7 +68,7 @@ void ui_Settings_screen_init(void)
     lv_obj_set_width(ui_Settings_LabelScanResult, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Settings_LabelScanResult, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_Settings_LabelScanResult, lv_pct(0));
-    lv_obj_set_y(ui_Settings_LabelScanResult, lv_pct(-5));
+    lv_obj_set_y(ui_Settings_LabelScanResult, lv_pct(-25));
     lv_obj_set_align(ui_Settings_LabelScanResult, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Settings_LabelScanResult, "---_----------");
     lv_obj_set_style_text_font(ui_Settings_LabelScanResult, &lv_font_montserrat_40, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -105,6 +105,14 @@ void ui_Settings_screen_init(void)
     lv_obj_set_style_bg_img_src(ui_Settings_SwitchBlueTooth, &ui_img_bluetooth_disabled_png,
                                 LV_PART_KNOB | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(ui_Settings_SwitchBlueTooth, &ui_img_bluetooth_png, LV_PART_KNOB | LV_STATE_CHECKED);
+
+    ui_Settings_ImgButton1 = lv_imgbtn_create(ui_Settings_TabPageAP);
+    lv_imgbtn_set_src(ui_Settings_ImgButton1, LV_IMGBTN_STATE_RELEASED, NULL, &ui_img_volume_up_png, NULL);
+    lv_obj_set_height(ui_Settings_ImgButton1, 48);
+    lv_obj_set_width(ui_Settings_ImgButton1, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_x(ui_Settings_ImgButton1, -31);
+    lv_obj_set_y(ui_Settings_ImgButton1, -149);
+    lv_obj_set_align(ui_Settings_ImgButton1, LV_ALIGN_CENTER);
 
     lv_obj_add_event_cb(ui_Settings_CheckboxWL134A, ui_event_Settings_CheckboxWL134A, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_Settings_CheckboxP1Design, ui_event_Settings_CheckboxP1Design, LV_EVENT_ALL, NULL);

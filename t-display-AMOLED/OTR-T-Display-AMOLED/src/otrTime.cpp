@@ -59,21 +59,21 @@ void updateTimeToScreen()   {
     DateTime now = rtc.now();
     if (now.isPM()) {
         sprintf(timeClock, "%d:%02d", now.hour() - 12, now.minute());
-        lv_label_set_text_fmt(ui_Time_Label_Time, "%s PM", timeClock);
     } else {
         sprintf(timeClock, "%d:%02d", now.hour(), now.minute());
-        lv_label_set_text_fmt(ui_Time_Label_Time, "%s AM", timeClock);
     }
     lv_label_set_text_fmt(ui_Main_TopPanelTime, "%s", timeClock);
     lv_label_set_text_fmt(ui_Scan_TopPanelTime, "%s", timeClock);
+  
+    
 }
 
 void updateDateToScreen()   {
     char dateStr[11];
     DateTime now = rtc.now();
     sprintf(dateStr, "%d/%d/%d", now.day(), now.month(), now.year());
-    
-    lv_label_set_text_fmt(ui_Time_Label_Date, "Date: %s", dateStr);
+    Serial.println(dateStr);
+    lv_label_set_text_fmt(ui_Time_Label_Date, "%s", dateStr);
 }
 
 void get_RTC_temperature() {

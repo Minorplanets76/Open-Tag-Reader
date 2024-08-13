@@ -14,10 +14,10 @@ void initFileSystem() {
 void SD_init(void)
 {
     bool mounted = amoled.installSD();
-    lv_label_set_recolor(ui_Main_Label1, true);
+    //lv_label_set_recolor(ui_Main_Label1, true);
     if (!mounted) {
         Serial.println("SD card installation failed");
-        lv_label_set_text(ui_Main_Label1, "#ff0000 SD card \nFailed");
+        //lv_label_set_text(ui_Main_Label1, "#ff0000 SD card \nFailed");
         return;
 
     } else {
@@ -27,7 +27,7 @@ void SD_init(void)
 
         Serial.printf("SD card installed. Size: %d MB, Total: %d MB, Used: %d MB\n", size, totalBytes, usedBytes);
 
-        lv_label_set_text_fmt(ui_Main_Label1, "#00ff00 SD CARD OK \nSize: %d MB", size);
+        //lv_label_set_text_fmt(ui_Main_Label1, "#00ff00 SD CARD OK \nSize: %d MB", size);
     }
 
 }

@@ -80,6 +80,7 @@ struct Animals {
     String species;
     String breed;
     String type;    //can't remember why I added this.  Possibly to differentiate between stud andcommercial
+    String name;
     String rfid;    //unique
     DateTime tagged;
     bool gender;    //fixed
@@ -114,6 +115,7 @@ struct Treatment    {
     String dose;
     uint8_t whp; //witholding period (days)
     String appliedBy;
+    String comment;
 };
 
 struct TraitOptions {
@@ -128,6 +130,7 @@ std::vector<Traits> traits;
 struct TransfersAndSales {
     String rfid;
     DateTime date;
+    String location;
     String pic;
     String destination;
     String destinationPic;
@@ -138,5 +141,13 @@ struct TransfersAndSales {
 void readLocations();
 void readTraitsFromCSV();
 void printTraits();
+
+void createAnimal();
+void modifyAnimal();
+
+void changeStatus();
+void changeGroup();
+
+void changeLocation();
 
 #endif
