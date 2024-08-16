@@ -26,7 +26,7 @@ void ui_Scan_screen_init(void)
 
     ui_Scan_LabelMain = lv_label_create(ui_Scan_TabScan);
     lv_obj_set_width(ui_Scan_LabelMain, lv_pct(100));
-    lv_obj_set_height(ui_Scan_LabelMain, lv_pct(30));
+    lv_obj_set_height(ui_Scan_LabelMain, lv_pct(35));
     lv_obj_set_x(ui_Scan_LabelMain, 0);
     lv_obj_set_y(ui_Scan_LabelMain, lv_pct(25));
     lv_obj_set_align(ui_Scan_LabelMain, LV_ALIGN_CENTER);
@@ -47,7 +47,7 @@ void ui_Scan_screen_init(void)
     lv_obj_set_y(ui_Scan_LabelTagID, lv_pct(-2));
     lv_obj_set_align(ui_Scan_LabelTagID, LV_ALIGN_TOP_MID);
     lv_label_set_text(ui_Scan_LabelTagID, "###_############");
-    lv_obj_set_style_text_font(ui_Scan_LabelTagID, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_Scan_LabelTagID, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Scan_Label5 = lv_label_create(ui_Scan_TabScan);
     lv_obj_set_width(ui_Scan_Label5, lv_pct(90));

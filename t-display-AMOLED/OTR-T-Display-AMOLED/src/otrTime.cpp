@@ -83,3 +83,14 @@ void clock_timer(lv_timer_t * timer) {
     updateTimeToScreen();
     updateBatteryImage();
 }
+DateTime stringToDateTime(String dateStr) {
+    int year = dateStr.substring(0, dateStr.indexOf('/')).toInt();
+    int month = dateStr.substring(dateStr.indexOf('/') + 1, dateStr.lastIndexOf('/')).toInt();
+    int day = dateStr.substring(dateStr.lastIndexOf('/') + 1).toInt();
+    return DateTime(year, month, day);
+}
+String dateTimeToString(DateTime dt) {
+    char dateStr[11];
+    sprintf(dateStr, "%02d/%02d/%04d", dt.day(), dt.month(), dt.year());
+    return String(dateStr);
+}

@@ -36,6 +36,6 @@ void updateTimeToScreen(void);
 void updateDateToScreen(void);
 void get_RTC_temperature(void);
 void clock_timer(lv_timer_t * timer);
-
-
+DateTime stringToDateTime(String dateStr);
+String dateTimeToString(DateTime dt);
 #endif

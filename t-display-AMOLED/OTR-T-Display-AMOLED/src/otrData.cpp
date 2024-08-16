@@ -156,3 +156,202 @@ void printTraits() {
         }
     }
 }
+
+Animals::Animals()  {
+    numAnimals = 0;
+    totalAnimals = 0;
+}
+    
+Animals::~Animals() {
+    delete[] animal;
+}
+void Animals::readFile() {
+    animalFilePath = "/" + speciesStrings[species] + "/" + speciesGroups[species] + ".csv";
+    animalFile = LittleFS.open(animalFilePath);
+    if (!animalFile) {
+        Serial.print("Failed to open file: ");
+        Serial.println(animalFilePath);
+        return;
+    }
+    animal = nullptr; // Initialize the class member animal to nullptr
+    animalFile.readStringUntil('\n'); // skip header
+    String animalRow;
+    while (animalFile.available()) {
+        // Read a row
+        String animalRow = animalFile.readStringUntil('\n');
+        totalAnimals++;
+        // Pick out columns
+        int commaIndex = 0;
+        String columns[14];
+        for (int i = 0; i < 14; i++) {
+        commaIndex = animalRow.indexOf(",", commaIndex);
+        if (commaIndex == -1) {
+            columns[i] = animalRow.substring(commaIndex + 1);
+            break;
+        }
+        columns[i] = animalRow.substring(0, commaIndex);
+        animalRow = animalRow.substring(commaIndex + 1);
+        }
+        
+
+        animal = (AnimalsFile*)realloc(animal, (numAnimals + 1) * sizeof(AnimalsFile));
+        animal[numAnimals].breed = columns[0];
+        animal[numAnimals].type = columns[1];
+        animal[numAnimals].name = columns[2];
+        animal[numAnimals].rfid = columns[3];
+        animal[numAnimals].tagged = stringToDateTime(columns[4]);
+        if (columns[5] == "F") {
+        animal[numAnimals].gender = true;
+        }
+        else {
+        animal[numAnimals].gender = false;
+        }
+        animal[numAnimals].mother = columns[6];
+        animal[numAnimals].father = columns[7];
+        animal[numAnimals].multi_birth = columns[8].toInt();
+        animal[numAnimals].location = columns[9];
+        animal[numAnimals].group = columns[10];
+        animal[numAnimals].status = columns[11];
+        animal[numAnimals].whpSafeDate = DateTime(columns[12].toInt());
+        animal[numAnimals].comment = columns[13];
+        numAnimals++; // Move the increment to the end
+    }
+    animalFile.close();
+}
+void Animals::addNew(AnimalsFile newAnimal) {
+    //readAnimalFile() must have already run
+    animal = (AnimalsFile*)realloc(animal, (numAnimals + 1) * sizeof(AnimalsFile));
+    animal[numAnimals] = newAnimal;
+    numAnimals++;
+    //append to file
+    File animalFile = LittleFS.open(animalFilePath, FILE_APPEND);
+    if (!animalFile) {
+        Serial.println("Failed to open animal file");
+        return;
+    }
+    
+    animalFile.print(newAnimal.breed + ",");
+    animalFile.print(newAnimal.type + ",");
+    animalFile.print(newAnimal.name + ",");
+    animalFile.print(newAnimal.rfid + ",");
+    animalFile.print(dateTimeToString(newAnimal.tagged) + ",");
+    animalFile.print((newAnimal.gender ? "F," : "M,") );
+    animalFile.print(newAnimal.mother + ",");
+    animalFile.print(newAnimal.father + ",");
+    animalFile.print(newAnimal.multi_birth + ",");
+    animalFile.print(newAnimal.location + ",");
+    animalFile.print(newAnimal.group + ",");
+    animalFile.print(newAnimal.status + ",");
+    animalFile.print(dateTimeToString(newAnimal.whpSafeDate) + ",");
+    animalFile.println(newAnimal.comment);
+    animalFile.close();
+}
+void Animals::modify(AnimalsFile updatedAnimal) {   
+        for (int i = 0; i < numAnimals; i++) {
+        if (animal[i].rfid == updatedAnimal.rfid) {
+            animal[i] = updatedAnimal;
+            animalsFilechanged = true;
+            return;
+        }
+    }
+    throw std::runtime_error("Animal not found");
+}
+
+void Animals::archive(AnimalsFile animalToRemove) {   
+    animalArchiveFilePath = "/" + speciesStrings[species] + "/archive/" + speciesGroups[species] + "_archive.csv";
+    File animalArchiveFile = LittleFS.open(animalArchiveFilePath, FILE_APPEND);
+    if (!animalArchiveFile) {
+        Serial.println("Failed to open animal archive file");
+        return;
+    }
+    
+    animalArchiveFile.print(animalToRemove.breed + ",");
+    animalArchiveFile.print(animalToRemove.type + ",");
+    animalArchiveFile.print(animalToRemove.name + ",");
+    animalArchiveFile.print(animalToRemove.rfid + ",");
+    animalArchiveFile.print(dateTimeToString(animalToRemove.tagged) + ",");
+    animalArchiveFile.print((animalToRemove.gender ? "F," : "M,") );
+    animalArchiveFile.print(animalToRemove.mother + ",");
+    animalArchiveFile.print(animalToRemove.father + ",");
+    animalArchiveFile.print(animalToRemove.multi_birth + ",");
+    animalArchiveFile.print(animalToRemove.location + ","); 
+    animalArchiveFile.print(animalToRemove.group + ",");
+    animalArchiveFile.print(animalToRemove.status + ",");
+    animalArchiveFile.print(dateTimeToString(animalToRemove.whpSafeDate) + ",");
+    animalArchiveFile.println(animalToRemove.comment);
+    animalArchiveFile.close();
+}
+void Animals::remove(AnimalsFile animalToRemove) {
+    for (int i = 0; i < numAnimals; i++) {
+        if (animal[i].rfid == animalToRemove.rfid) {
+            // Shift all elements after the removed element to the left
+            for (int j = i; j < numAnimals - 1; j++) {
+                animal[j] = animal[j + 1];
+            }
+            numAnimals--;
+            animalsFilechanged = true;
+            return;
+        }
+    }
+    throw std::runtime_error("Animal not found");
+}
+
+Animals::AnimalsFile& Animals::find(const String& rfid) {
+    for (int i = 0; i < numAnimals; i++) {
+        if (animal[i].rfid == rfid) {
+            return animal[i];
+        }
+    }
+    throw std::runtime_error("Animal not found");
+}
+
+void Animals::create() {
+
+}
+
+void Animals::renewFile() {
+    //copy header
+    File currentFile =LittleFS.open(animalFilePath, "r");
+    if (!currentFile) {
+        Serial.println("Failed to open animal file");
+        return;
+    }
+    String header ="";
+    if (currentFile.available()) {
+        header = currentFile.readStringUntil('\n');
+    }
+    currentFile.close();
+    //rename file
+    animalFilePathTemp = animalFilePath;
+    animalFilePathTemp.replace(".csv", ".tmp");
+    if (!LittleFS.rename(animalFilePath, animalFilePathTemp)) {
+        Serial.println("Failed to rename animal file");
+        return;
+    }
+    //create new file
+    File newFile = LittleFS.open(animalFilePath, FILE_WRITE);
+    if (!newFile) {
+        Serial.println("Failed to create new animal file");
+        return;
+    }
+    newFile.println(header);
+    //copy animals to new file
+    for (int i = 0; i < numAnimals; i++) {
+        newFile.print(animal[i].breed + ",");
+        newFile.print(animal[i].type + ",");
+        newFile.print(animal[i].name + ",");
+        newFile.print(animal[i].rfid + ",");
+        newFile.print(dateTimeToString(animal[i].tagged) + ",");
+        newFile.print((animal[i].gender ? "F," : "M,") );
+        newFile.print(animal[i].mother + ",");
+        newFile.print(animal[i].father + ",");
+        newFile.print(animal[i].multi_birth + ",");
+        newFile.print(animal[i].location + ",");
+        newFile.print(animal[i].group + ",");
+        newFile.print(animal[i].status + ",");
+        newFile.print(dateTimeToString(animal[i].whpSafeDate) + ",");
+        newFile.println(animal[i].comment);
+    }
+    newFile.close();
+    
+}

@@ -3408,7 +3408,7 @@
                   {
                     "nid": -429510353,
                     "strtype": "CHANGE SCREEN/Fade_mode",
-                    "strval": "FADE_ON",
+                    "strval": "MOVE_RIGHT",
                     "InheritedType": 3
                   },
                   {
@@ -14055,7 +14055,7 @@
                         "strtype": "OBJECT/Size",
                         "intarray": [
                           100,
-                          30
+                          35
                         ],
                         "InheritedType": 7
                       },
@@ -14638,7 +14638,7 @@
                               {
                                 "nid": 1501688295,
                                 "strtype": "_style/Text_Font",
-                                "strval": "montserrat_20",
+                                "strval": "montserrat_22",
                                 "InheritedType": 3
                               }
                             ],
@@ -23576,7 +23576,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "C:\\Users\\chris\\Documents\\Coding\\Open_Tag_Reader\\Open-Tag-Reader\\t-display-AMOLED\\OTR-T-Display-AMOLED\\src\\ui",
     "projectExportFolderPath": "C:\\Users\\chris\\Documents\\Coding\\Open_Tag_Reader\\Open-Tag-Reader\\t-display-AMOLED\\OTR-T-Display-AMOLED\\src\\ui",
-    "backup_cnt": 3652,
+    "backup_cnt": 4151,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.11",
     "callfuncsexport": "CPP_FILE",
