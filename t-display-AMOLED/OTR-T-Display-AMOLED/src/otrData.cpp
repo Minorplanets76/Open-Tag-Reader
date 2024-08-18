@@ -1,6 +1,6 @@
 #include "otrData.h"
 
-void BucketFile::readBucketFile() {
+void BUCKETFILE::readBucketFile() {
     //Open file
     bucket = LittleFS.open(bucketFilePath);
     if(!bucket) {
@@ -22,7 +22,6 @@ void BucketFile::readBucketFile() {
         return;
     }
     if (csvBucket != "PIC,RFID,NLISID,Visual_ID,IssueDate,ManufactureDate,Colour") {
-        Serial.println("Incorrect header");
         //check if quotation marks are the issue
         csvBucket.replace("\"","");
         Serial.println(csvBucket);
@@ -30,7 +29,7 @@ void BucketFile::readBucketFile() {
             Serial.println("Incorrect header");
             return;
         }
-       Serial.println("Correct header");
+        //Serial.println("Correct header");
     }
     
     while (bucket.available()) {
@@ -41,7 +40,6 @@ void BucketFile::readBucketFile() {
             addTag();
         }
     }
-    
     bucket.close();
     tags.close();
     Serial.print(rowsBucket);
@@ -52,30 +50,31 @@ void BucketFile::readBucketFile() {
         Serial.println("Tags.csv successfully updated");
         LittleFS.remove(bucketFilePath);
     }
-
 }
 
 
-bool BucketFile:: checkNew() {
-    //tags.csv has an added column for Status
-    csvBucket.replace("\n",",UNUSED\n");
-    //loop through tags.csv to check if tag is new
-    tags.seek(0, SeekEnd);
-    //start from the end of file (most recently added)
-    while (tags.position() > 0) {
-        //move the file pointer to previous row
-        tags.seek(tags.position() - 1);
-        // read the row
+bool BUCKETFILE::checkNew() {
+  //tags.csv has an added column for Status
+  csvBucket.replace("\n",",UNUSED\n");
+  tags.seek(1, SeekEnd);//start from the end of file (most recently added) but before /n
+  char c;
+  int startPosition;
+  while (tags.position() > 0) {
+    c = tags.read();
+    if (c == '\n') {
+        startPosition = tags.position()-1;
         csvTags = tags.readStringUntil('\n');
         if (csvTags == csvBucket) {
             return true;
         }
+        tags.seek(startPosition);
     }
-    return false;
+    tags.seek(tags.position() - 1);
+  }
+  return false;
 }
 
-void BucketFile::addTag() {
-    
+void BUCKETFILE::addTag() {
     tags.print(csvBucket);
     tags.println();
     rowsAdded++;
@@ -88,7 +87,6 @@ void readLocations() {
         Serial.println("Failed to open location file");
         return;
     }
-
     while (locationFile.available()) {
         // Read a row
         String locationRow = locationFile.readStringUntil('\n');
@@ -96,7 +94,7 @@ void readLocations() {
             //Skip header row
             locationRow = locationFile.readStringUntil('\n');
         }
-            //Pick out columns
+        //Pick out columns
         location[numLocations].name = locationRow.substring(0, locationRow.indexOf(","));
         location[numLocations].PIC = locationRow.substring(locationRow.indexOf(",")+1, locationRow.length());
         numLocations++;
@@ -157,15 +155,12 @@ void printTraits() {
     }
 }
 
-Animals::Animals()  {
+ANIMALS::ANIMALS()  {
     numAnimals = 0;
     totalAnimals = 0;
 }
     
-Animals::~Animals() {
-    delete[] animal;
-}
-void Animals::readFile() {
+void ANIMALS::readFile() {
     animalFilePath = "/" + speciesStrings[species] + "/" + speciesGroups[species] + ".csv";
     animalFile = LittleFS.open(animalFilePath);
     if (!animalFile) {
@@ -192,19 +187,17 @@ void Animals::readFile() {
         columns[i] = animalRow.substring(0, commaIndex);
         animalRow = animalRow.substring(commaIndex + 1);
         }
-        
-
         animal = (AnimalsFile*)realloc(animal, (numAnimals + 1) * sizeof(AnimalsFile));
         animal[numAnimals].breed = columns[0];
         animal[numAnimals].type = columns[1];
         animal[numAnimals].name = columns[2];
         animal[numAnimals].rfid = columns[3];
-        animal[numAnimals].tagged = stringToDateTime(columns[4]);
+        animal[numAnimals].tagged = columns[4];
         if (columns[5] == "F") {
-        animal[numAnimals].gender = true;
+            animal[numAnimals].gender = true;
         }
         else {
-        animal[numAnimals].gender = false;
+            animal[numAnimals].gender = false;
         }
         animal[numAnimals].mother = columns[6];
         animal[numAnimals].father = columns[7];
@@ -218,7 +211,7 @@ void Animals::readFile() {
     }
     animalFile.close();
 }
-void Animals::addNew(AnimalsFile newAnimal) {
+void ANIMALS::addNew(AnimalsFile newAnimal) {
     //readAnimalFile() must have already run
     animal = (AnimalsFile*)realloc(animal, (numAnimals + 1) * sizeof(AnimalsFile));
     animal[numAnimals] = newAnimal;
@@ -229,12 +222,11 @@ void Animals::addNew(AnimalsFile newAnimal) {
         Serial.println("Failed to open animal file");
         return;
     }
-    
     animalFile.print(newAnimal.breed + ",");
     animalFile.print(newAnimal.type + ",");
     animalFile.print(newAnimal.name + ",");
     animalFile.print(newAnimal.rfid + ",");
-    animalFile.print(dateTimeToString(newAnimal.tagged) + ",");
+    animalFile.print(newAnimal.tagged + ",");
     animalFile.print((newAnimal.gender ? "F," : "M,") );
     animalFile.print(newAnimal.mother + ",");
     animalFile.print(newAnimal.father + ",");
@@ -242,34 +234,33 @@ void Animals::addNew(AnimalsFile newAnimal) {
     animalFile.print(newAnimal.location + ",");
     animalFile.print(newAnimal.group + ",");
     animalFile.print(newAnimal.status + ",");
-    animalFile.print(dateTimeToString(newAnimal.whpSafeDate) + ",");
+    animalFile.print(dateToString(newAnimal.whpSafeDate) + ",");
     animalFile.println(newAnimal.comment);
     animalFile.close();
 }
-void Animals::modify(AnimalsFile updatedAnimal) {   
-        for (int i = 0; i < numAnimals; i++) {
+
+void ANIMALS::modify(AnimalsFile updatedAnimal) {   
+    for (int i = 0; i < numAnimals; i++) {
         if (animal[i].rfid == updatedAnimal.rfid) {
             animal[i] = updatedAnimal;
             animalsFilechanged = true;
             return;
         }
     }
-    throw std::runtime_error("Animal not found");
 }
 
-void Animals::archive(AnimalsFile animalToRemove) {   
+void ANIMALS::archive(AnimalsFile animalToRemove) {   
     animalArchiveFilePath = "/" + speciesStrings[species] + "/archive/" + speciesGroups[species] + "_archive.csv";
     File animalArchiveFile = LittleFS.open(animalArchiveFilePath, FILE_APPEND);
     if (!animalArchiveFile) {
         Serial.println("Failed to open animal archive file");
         return;
     }
-    
     animalArchiveFile.print(animalToRemove.breed + ",");
     animalArchiveFile.print(animalToRemove.type + ",");
     animalArchiveFile.print(animalToRemove.name + ",");
     animalArchiveFile.print(animalToRemove.rfid + ",");
-    animalArchiveFile.print(dateTimeToString(animalToRemove.tagged) + ",");
+    animalArchiveFile.print(animalToRemove.tagged + ",");
     animalArchiveFile.print((animalToRemove.gender ? "F," : "M,") );
     animalArchiveFile.print(animalToRemove.mother + ",");
     animalArchiveFile.print(animalToRemove.father + ",");
@@ -277,11 +268,12 @@ void Animals::archive(AnimalsFile animalToRemove) {
     animalArchiveFile.print(animalToRemove.location + ","); 
     animalArchiveFile.print(animalToRemove.group + ",");
     animalArchiveFile.print(animalToRemove.status + ",");
-    animalArchiveFile.print(dateTimeToString(animalToRemove.whpSafeDate) + ",");
+    animalArchiveFile.print(dateToString(animalToRemove.whpSafeDate) + ",");
     animalArchiveFile.println(animalToRemove.comment);
     animalArchiveFile.close();
 }
-void Animals::remove(AnimalsFile animalToRemove) {
+
+void ANIMALS::remove(AnimalsFile animalToRemove) {
     for (int i = 0; i < numAnimals; i++) {
         if (animal[i].rfid == animalToRemove.rfid) {
             // Shift all elements after the removed element to the left
@@ -293,10 +285,9 @@ void Animals::remove(AnimalsFile animalToRemove) {
             return;
         }
     }
-    throw std::runtime_error("Animal not found");
 }
 
-Animals::AnimalsFile& Animals::find(const String& rfid) {
+ANIMALS::AnimalsFile& ANIMALS::find(String& rfid) {
     for (int i = 0; i < numAnimals; i++) {
         if (animal[i].rfid == rfid) {
             return animal[i];
@@ -305,11 +296,11 @@ Animals::AnimalsFile& Animals::find(const String& rfid) {
     throw std::runtime_error("Animal not found");
 }
 
-void Animals::create() {
-
+void ANIMALS::create() {
+    //pull data from ui
 }
 
-void Animals::renewFile() {
+void ANIMALS::renewFile() {
     //copy header
     File currentFile =LittleFS.open(animalFilePath, "r");
     if (!currentFile) {
@@ -341,7 +332,7 @@ void Animals::renewFile() {
         newFile.print(animal[i].type + ",");
         newFile.print(animal[i].name + ",");
         newFile.print(animal[i].rfid + ",");
-        newFile.print(dateTimeToString(animal[i].tagged) + ",");
+        newFile.print(animal[i].tagged + ",");
         newFile.print((animal[i].gender ? "F," : "M,") );
         newFile.print(animal[i].mother + ",");
         newFile.print(animal[i].father + ",");
@@ -349,9 +340,152 @@ void Animals::renewFile() {
         newFile.print(animal[i].location + ",");
         newFile.print(animal[i].group + ",");
         newFile.print(animal[i].status + ",");
-        newFile.print(dateTimeToString(animal[i].whpSafeDate) + ",");
+        newFile.print(dateToString(animal[i].whpSafeDate) + ",");
         newFile.println(animal[i].comment);
     }
     newFile.close();
+}
+
+void RECORDS::readFile() {
+    recordsFilePath = "/" + speciesStrings[species] + "/records.csv";
+    recordsFile = LittleFS.open(recordsFilePath, "r");
+    if (!recordsFile) {
+        Serial.println("Failed to open records file");
+        return;
+    }
+    String header = recordsFile.readStringUntil('\n');
+    
+    recordsFile.close();
+}
+
+void RECORDS::count() {
+    recordsFile = LittleFS.open(recordsFilePath, "r");
+    recordsFile.seek(0, SeekEnd);
+    recordsFile.seek(recordsFile.position() - 1);
+    totalRecords = recordsFile.readStringUntil(',').toInt();
+    recordsFile.close();
+    recordsCounted = true;
+}
+void RECORDS::create() {
+    //pull data from ui
+}
+
+void RECORDS::addNew(Records newRecord) {
+    recordsFile = LittleFS.open(recordsFilePath, FILE_APPEND);
+    if (!recordsFile) {
+        Serial.println("Failed to open records file");
+        return;
+    }
+    recordsFile.seek(0, SeekEnd); //go to end of file
+    if (!recordsCounted) {//count function must be run prior
+        count();
+    }
+    totalRecords++; 
+    recordsFile.print(totalRecords);
+    recordsFile.print("," + newRecord.rfid + ",");
+    recordsFile.print(newRecord.timeStamp + ",");
+    recordsFile.print(newRecord.location + ",");
+    recordsFile.print(newRecord.status + ",");
+    recordsFile.print(newRecord.group + ",");
+    recordsFile.print(newRecord.weight + ","); //placeholder for weight
+    recordsFile.print(newRecord.trait + ",");
+    recordsFile.print(String(newRecord.treat) + ",");
+    recordsFile.println(newRecord.comment);
+    recordsFile.close();
+}
+
+void RECORDS::createSession() {
+    //session name is current date with sequential number yyyymmdd_1, yyyymmdd_2 etc
+    //in order to continue a session after power down etc last 5 sessions stored in last_sessions.txt
+    readLastSessions();
+    DateTime dt = rtc.now();
+    String dateStr = dateToSessionFormat(dt);
+    if(lastSessions[4].substring(0, 8) == dateStr) {
+        int num = lastSessions[4].substring(9).toInt();
+        session = dateStr + "_" + String(num + 1);
+    } else {
+        session = dateStr + "_1";
+    }
+    String newSessions[5];
+    for (int i = 1; i < 5; i++) {
+        newSessions[i-1] = lastSessions[i];
+    }
+    newSessions[4] = session;
+    File file = LittleFS.open(lastSessionFilePath, "w");
+    if (!file) {
+        Serial.println("Failed to create last sessions file");
+        return;
+    }
+    for (int i = 0; i < 5; i++) {
+        file.println(newSessions[i]);
+    }
+    file.close();
+
+}
+
+void RECORDS::readLastSessions() {
+    lastSessionFilePath = "/" + speciesStrings[species] + "/sessions/last_sessions.txt";
+    File file = LittleFS.open(lastSessionFilePath, "r");
+    if (!file) {
+        // Create the file if it doesn't exist
+        file = LittleFS.open(lastSessionFilePath, "w");
+        if (!file) {
+            Serial.println("Failed to create last sessions file");
+            return;
+        }
+        // Initialize the file with empty lines
+        for (int i = 0; i < 5; i++) {
+            file.println();
+        }
+        file.close();
+        // Reopen the file for reading
+        file = LittleFS.open(lastSessionFilePath, "r");
+    }
+
+    int i = 0;
+    while (file.available() && i < 5) {
+        String line = file.readStringUntil('\n');
+        lastSessions[i] = line;
+        i++;
+    }
+    file.close();
+}
+RECORDS::Records* RECORDS::find(String& rfid, int& num) {
+    recordsFile = LittleFS.open(recordsFilePath, "r");
+    String csvRecord = recordsFile.readStringUntil('\n'); //1st line
+    Records* thisRfid;
+    num = 0;
+    while (recordsFile.available()) {
+        csvRecord = recordsFile.readStringUntil('\n');
+        int fileIndex = csvRecord.indexOf(rfid);
+        if (fileIndex != -1) {
+            // Pick out columns
+            int commaIndex = 0;
+            String columns[10];
+            for (int i = 0; i < 10; i++) {
+                if (commaIndex == -1) {
+                    columns[i] = csvRecord.substring(commaIndex + 1);
+                    break;
+                }
+                else {
+                    columns[i] =csvRecord.substring(commaIndex, csvRecord.indexOf(',', commaIndex));
+                    commaIndex = csvRecord.indexOf(',', commaIndex + 1);
+                }
+            }
+            thisRfid[num].index = columns[0].toInt();
+            thisRfid[num].rfid = columns[1];
+            thisRfid[num].timeStamp = columns[2];
+            thisRfid[num].location = columns[3];
+            thisRfid[num].status = columns[4];
+            thisRfid[num].group = columns[5];
+            thisRfid[num].weight = columns[6].toFloat();
+            thisRfid[num].trait = columns[7];
+            thisRfid[num].treat = columns[8].toInt();
+            thisRfid[num].comment = columns[9];
+            num++;
+        }
+    }
+    recordsFile.close();
+    return thisRfid;
     
 }

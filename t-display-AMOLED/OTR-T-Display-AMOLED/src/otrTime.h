@@ -36,6 +36,12 @@ void updateTimeToScreen(void);
 void updateDateToScreen(void);
 void get_RTC_temperature(void);
 void clock_timer(lv_timer_t * timer);
-DateTime stringToDateTime(String dateStr);
-String dateTimeToString(DateTime dt);
+DateTime stringToDate(String dateStr);
+String dateToString(DateTime dt);
+String timeStampToString(DateTime dt);
+DateTime stringToTimeStamp(String tmStmp);
+String dateToSessionFormat(DateTime dt);
+String ageFromDate(String dateStr);
+String whpSafeDate(String dateStr, String whp);
+
 #endif

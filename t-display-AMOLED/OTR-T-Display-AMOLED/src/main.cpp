@@ -55,7 +55,9 @@ void lv_example_get_started_1(void)
         Serial.println("Home key pressed!");
         static uint32_t checkMs = 0;
         if (millis() > checkMs) {
-            _ui_screen_change(&ui_Main, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Main_screen_init);
+            _ui_screen_change(&ui_Main, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_Main_screen_init);
+            led.fade.status = true;
+            vibrate.error();
             uint16_t battVoltageTest = amoled.getBattVoltage();
             double battVoltageInVolts = battVoltageTest / 1000.0;
             uint16_t vbusVoltageMV = readVbusVoltage();
@@ -131,8 +133,9 @@ void setup()
     led.init();
     vibrate.begin();
     vibrate.longBuzz();
-    // playWaltzingMatilda(buzzerPin);
-    // playClickGoesTheShears(buzzerPin);
+    //playWaltzingMatilda(buzzerPin);
+    //playClickGoesTheShears(buzzerPin);
+    //led.flash();
 
     updateBatteryImage();
     updateTimeToScreen();
@@ -165,6 +168,8 @@ void loop()
             lv_label_set_text_fmt(ui_Main_Label1, "SCAN OK \n %s", scanResult.rfidID);
             lv_label_set_text_fmt(ui_Scan_LabelTagID, "%s", scanResult.rfidID);
             lv_label_set_text(ui_Scan_LabelMain, "SCAN OK");
+            led.flash();
+            vibrate.success();
 
         }
     

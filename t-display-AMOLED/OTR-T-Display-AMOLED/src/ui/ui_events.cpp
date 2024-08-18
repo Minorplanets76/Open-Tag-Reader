@@ -13,8 +13,8 @@
 extern RTC_DS3231 rtc;
 extern VIBRATE vibrate;
 extern RFIDReader reader;
+extern LED led;
 extern int ledPin;
-extern void toggleLed(int ledPin);
 extern int buzzerPin;
 extern void playNote(int buzzerPin);
 void btn_event_cb(lv_event_t * e)
@@ -27,8 +27,8 @@ void btn_event_cb(lv_event_t * e)
         // toggle the LED when the button is pressed
         //toggleLed(ledPin);
         playNote(buzzerPin);
-
-        reader.toggle();
+        vibrate.tap();
+        led.toggle();
 }
 
 void setTimeManual(lv_event_t * e)

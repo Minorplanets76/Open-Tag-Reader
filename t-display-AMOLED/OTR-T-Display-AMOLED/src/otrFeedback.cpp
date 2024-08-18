@@ -11,8 +11,10 @@
 
 extern LilyGo_Class amoled;
 extern LED led;
+extern VIBRATE vibrate;
 int buzzTime;
 int startBuzzTime;
+
 
 float readVbusVoltage() {
             esp_adc_cal_characteristics_t adc_chars;
@@ -100,10 +102,7 @@ std::map<std::string, int> noteFrequencies = {
 };
 
 
-// Function to play the melody "Click Goes The Shears"
-#include <vector>
 
-// Function to play the melody "Click Goes The Shears"
 void playClickGoesTheShears(int buzzerPin)
 {
     // Melody notes and pauses defined by their names ("P" for pause)
@@ -126,7 +125,7 @@ void playClickGoesTheShears(int buzzerPin)
     }
 }
 
-// Function to play the melody "Waltzing Matilda" using note names
+
 void playWaltzingMatilda(int buzzerPin)
 {
     // Melody notes and pauses defined by their names ("P" for pause)
@@ -156,42 +155,58 @@ void LED::init(){
     pinMode(ledPin, OUTPUT);
     digitalWrite(ledPin, LOW);
     ledcAttachPin(ledPin, 1);
-    lv_timer_create(led_timer, fade.interval, NULL);
     ledcSetup(1, 5000, 10);
 }
 
 void LED::toggle(){
-    digitalWrite(ledPin, !digitalRead(ledPin));
+    if (fade.status) {
+        fade.status = 0;
+        fade.duty = fade.min;
+        fade.direction = 0;
+        
+    } else {
+        if(fade.duty == fade.min){
+            fade.duty = fade.max;
+
+        } else {
+            fade.duty = fade.min;
+        }
+    }
+    ledcWrite(1, fade.duty);
+    
 }
 
 void LED::flash(){
     fade.status = 1;
     fade.direction = 1;
-    fade.duty = 900;
+    fade.duty = fade.flash;
     ledcWrite(1, fade.duty);
 
 }
 void LED::pulsing(){
-    if(fade.status){
-        if(fade.direction){
+    if (fade.status) {
+        if (fade.direction) { 
             fade.duty += fade.increment;
-            if(fade.duty >= fade.max){
-                fade.duty = fade.max;
+            if (fade.duty >= fade.max) {
                 fade.direction = 0;
             }
-        }else{
+        } else {
             fade.duty -= fade.increment;
-            if(fade.duty <= fade.min){
+            if (fade.duty <= fade.min) {
                 fade.duty = fade.min;
                 fade.direction = 1;
+            } else if (fade.duty >= fade.max) {
+                fade.duty -= (fade.increment * 4);
+                fade.direction = 0;
             }
         }
-        ledcWrite(1, fade.duty);
+        //Serial.print("fade.duty: "); Serial.println(led.fade.duty);
+        ledcWrite(1, fade.duty); // Update the LED brightness
     }
-    
 }
 void led_timer(lv_timer_t * timer) {
     led.pulsing();
+    vibrate.monitor();
 }
 void VIBRATE::begin() {
     pinMode(vibratePin, OUTPUT);
@@ -199,59 +214,93 @@ void VIBRATE::begin() {
 }
 void VIBRATE::longBuzz() {
     digitalWrite(vibratePin, HIGH);
-    lv_timer_create([](lv_timer_t *t) {
-        vibrateStop();
-        lv_timer_del(t);
-    }, 2000, NULL);
+    status = 1;
+    active = 1;
+    count = 0;
+    repeat = 0;
+    buzzLength = duration * longBuzzMultiplier;
 }
 
 void VIBRATE::error() {
     digitalWrite(vibratePin, HIGH);
-    lv_timer_create([](lv_timer_t *t) {
-        vibrateStop();
-        lv_timer_del(t);
-    }, 1000, NULL);
-        
-    lv_timer_create([](lv_timer_t *t) {
-        vibrateStart();
-        lv_timer_del(t);
-    }, 1200, NULL);
-
-    lv_timer_create([](lv_timer_t *t) {
-        vibrateStop();
-        lv_timer_del(t);
-    }, 2200, NULL);
+    status = 1;
+    active = 1;
+    count = 0;
+    repeat = 1;
+    buzzLength = errorDuration;
+    buzzGap = errorGap;
+    numRepeats = errorCount;
+    
 }
-
 void VIBRATE::success() {
     digitalWrite(vibratePin, HIGH);
-    lv_timer_create([](lv_timer_t *t) {
-        vibrateStop();
-        lv_timer_del(t);
-    }, 700, NULL);
+    status = 1;
+    active = 1;
+    count = 0;
+    repeat = 0;
+    buzzLength = duration;
 }
 
 
 void VIBRATE::tap() {
     digitalWrite(vibratePin, HIGH);
-    lv_timer_create([](lv_timer_t *t) {
-        vibrateStop();
-        lv_timer_del(t);
-    }, 500, NULL);
+    status = 1;
+    active = 1;
+    count = 0;
+    repeat = 0;
+    buzzLength = duration / tapDivisor;
 }
 
 void VIBRATE::stop() {
     digitalWrite(vibratePin, LOW);
+    status = 0;
+    repeat = 0;
+    active = 0;
+    Serial.println("buzz stop");
 }
 void VIBRATE::toggle() {
      digitalWrite(vibratePin, !digitalRead(vibratePin));
+     status = !status;
+     active = !active;
 }
 
-void vibrateStop(void) {
-    VIBRATE vibe;
-    digitalWrite(vibe.vibratePin, LOW);
+void VIBRATE::start() {
+    digitalWrite(vibratePin, HIGH);
+    status = 1;
+    active = 1;
+    repeat = 1;
+    buzzLength = duration;
+    buzzGap = 0;
 }
-void vibrateStart(void) {
-    VIBRATE vibe;
-    digitalWrite(vibe.vibratePin, HIGH);
+
+void VIBRATE::monitor() {
+    if (active) {
+        count = count + interval;
+        if (repeat) {
+            if (status) {
+                if (count >= buzzLength) {
+                    digitalWrite(vibratePin, LOW);
+                    status = 0;
+                    count = 0;
+                    cycleCount++;
+                    if (cycleCount >= numRepeats) {
+                        repeat = 0;
+                        cycleCount = 0;
+                        stop();
+                    }
+                } 
+            } else {
+                    if (count >= buzzGap) {
+                        digitalWrite(vibratePin, HIGH);
+                        status = 1;
+                        count = 0;
+                    }
+             }
+        }  else {
+            if (count >= buzzLength) {
+                stop();
+            }
+        }
+    }
+
 }

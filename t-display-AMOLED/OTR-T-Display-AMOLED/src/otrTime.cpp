@@ -84,13 +84,35 @@ void clock_timer(lv_timer_t * timer) {
     updateBatteryImage();
 }
 DateTime stringToDateTime(String dateStr) {
-    int year = dateStr.substring(0, dateStr.indexOf('/')).toInt();
+    int day = dateStr.substring(0, dateStr.indexOf('/')).toInt();
     int month = dateStr.substring(dateStr.indexOf('/') + 1, dateStr.lastIndexOf('/')).toInt();
-    int day = dateStr.substring(dateStr.lastIndexOf('/') + 1).toInt();
+    int year = dateStr.substring(dateStr.lastIndexOf('/') + 1).toInt();
     return DateTime(year, month, day);
 }
 String dateTimeToString(DateTime dt) {
     char dateStr[11];
     sprintf(dateStr, "%02d/%02d/%04d", dt.day(), dt.month(), dt.year());
     return String(dateStr);
+}
+
+String timeStampToString(DateTime dt) {
+    char dateStr[20];
+    sprintf(dateStr, "%02d/%02d/%04d %02d:%02d:%02d", dt.day(), dt.month(), dt.year(), dt.hour(), dt.minute(), dt.second());
+    return String(dateStr);
+}
+
+DateTime stringToTimeStamp(String tmStmp) {
+    int day = tmStmp.substring(0, tmStmp.indexOf('/')).toInt();
+    int month = tmStmp.substring(tmStmp.indexOf('/') + 1, tmStmp.lastIndexOf('/')).toInt();
+    int year= tmStmp.substring(tmStmp.lastIndexOf('/') + 1, 4).toInt();
+    int hour = tmStmp.substring(tmStmp.indexOf(' ') + 1, tmStmp.indexOf(':')).toInt();
+    int minute = tmStmp.substring(tmStmp.indexOf(':') + 1, tmStmp.lastIndexOf(':')).toInt();
+    int second = tmStmp.substring(tmStmp.lastIndexOf(':') + 1).toInt();
+    return DateTime(year, month, day, hour, minute, second);
+}
+
+String dateToSessionFormat(DateTime dt) {
+    char datestr[8];
+    sprintf(datestr, "%04d%02d%02d", dt.year(), dt.month(), dt.day());
+    return String(datestr);
 }

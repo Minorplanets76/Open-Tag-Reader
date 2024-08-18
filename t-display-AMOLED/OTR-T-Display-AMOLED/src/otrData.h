@@ -7,8 +7,10 @@
 #include <LittleFS.h>
 #include "otrTime.h"
 
+extern RTC_DS3231 rtc;
+
 String traitsFilePath = "/traits.csv";
-class BucketFile {
+class BUCKETFILE {
     public:
         // bucket file in follwing format
         // "PIC","RFID","NLISID","Visual_ID","IssueDate","ManufactureDate","Colour"
@@ -46,14 +48,14 @@ class BucketFile {
     
 };
 
-class Animals {
+class ANIMALS {
     public:
         struct AnimalsFile {
             String breed;
             String type;    //can't remember why I added this.  Possibly to differentiate between stud andcommercial
             String name;
             String rfid;    //unique
-            DateTime tagged;
+            String tagged;
             bool gender;    //fixed M/F TRUE == "F"
             String mother;  //future feature
             String father;
@@ -67,11 +69,12 @@ class Animals {
         String animalFilePath = "/animals.csv";
         String animalArchiveFilePath = "/archive/aminals_archive.csv";
         String animalFilePathTemp = "/backup/animals.tmp";
-        const String speciesStrings[2] = {"Sheep", "Cattle"};
-        const String speciesGroups[2] = {"Flock", "Herd"};
 
-        Animals();
-        ~Animals();
+
+        ANIMALS();
+        ~ANIMALS() {
+            delete [] animal;
+        }
         void readFile();
         void addNew(AnimalsFile);   
         void modify(AnimalsFile);
@@ -79,16 +82,12 @@ class Animals {
         void remove(AnimalsFile);
         void create();
         void renewFile();
-        AnimalsFile& find(const String& rfid);
+        AnimalsFile& find(String& rfid);
         
         File animalFile;
         bool animalsFilechanged = false;
         uint16_t totalAnimals;
-        enum Species {
-            Sheep,
-            Cattle
-        };
-        Species species = Sheep;
+
     
     private:
         AnimalsFile* animal;
@@ -96,50 +95,53 @@ class Animals {
         
 };
 
-struct Locations {
-    String name;
-    String PIC;
+class RECORDS {
+    public:
+        struct Records {
+            String index;
+            String rfid; //record created when scanned
+            String timeStamp;
+            String location;
+            String status;
+            String group;
+            String weight;
+            String trait;  //delinineated list of traits new values eg. Udder/Dry;Feet/Bad,
+            String treat; //Treat records given an index
+            String comment;
+        };
+        String recordsFilePath = "/records.csv";
+        String session;
+        String lastSessions[5];
+        String lastSessionFilePath = "sessions/last_sessions.txt";
+        String sessionFilePath = "session/yyyymmdd_1.csv";
+        String sessionHeader = "Index,RFID,Timestamp,Location,Status,Group,Weight,Trait,Treat,Comment/n";
+        void readFile();
+        void count();
+        void create();
+        void addNew(Records);
+        void createSession();
+        void readLastSessions();
+        Records* find(String& rfid, int& num);
+        File recordsFile;
+        bool recordsFilechanged = false;    
+        uint32_t totalRecords;
+        bool recordsCounted = false;
+
+    private:
+        Records* record;
+        int numRecords;
+        
+    
+
 };
-Locations* location;
-enum Status {
-    ALIVE,
-    DEAD,
-    SOLD
+
+const String speciesStrings[2] = {"Sheep", "Cattle"};
+const String speciesGroups[2] = {"Flock", "Herd"};
+        enum Species {
+    Sheep,
+    Cattle
 };
-
-enum TagStatus {
-    Unused,
-    Active,
-    Inactive
-};
-
-Status status = ALIVE;
-TagStatus tagStatus = Unused;
-
-struct tags {
-    String pic;
-    String rfid;
-    String nlisid;
-    String visual_id;
-    String issueDate;
-    String manufactureDate;
-    String colour;
-    Status status;
-};
-
-
-
-struct Records {
-    uint32_t index;
-    String rfid; //record created when scanned
-    DateTime timeStamp;
-    String status;
-    String group;
-    float weight;
-    String trait;  //delinineated list of traits new values eg. Udder/Dry;Feet/Bad,
-    uint32_t treat; //Treat records given an index
-    String comment;
-};
+Species species = Sheep;
 
 struct Treatment    {
     uint32_t index;
@@ -171,6 +173,37 @@ struct Transfers {
     String destinationPic;
     float price;
     String comment;
+};
+
+struct Locations {
+    String name;
+    String PIC;
+};
+Locations* location;
+enum Status {
+    ALIVE,
+    DEAD,
+    SOLD
+};
+
+enum TagStatus {
+    Unused,
+    Active,
+    Inactive
+};
+
+Status status = ALIVE;
+TagStatus tagStatus = Unused;
+
+struct tags {
+    String pic;
+    String rfid;
+    String nlisid;
+    String visual_id;
+    String issueDate;
+    String manufactureDate;
+    String colour;
+    Status status;
 };
 
 void readLocations();
