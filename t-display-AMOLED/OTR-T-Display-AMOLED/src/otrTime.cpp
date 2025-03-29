@@ -112,7 +112,29 @@ DateTime stringToTimeStamp(String tmStmp) {
 }
 
 String dateToSessionFormat(DateTime dt) {
-    char datestr[8];
-    sprintf(datestr, "%04d%02d%02d", dt.year(), dt.month(), dt.day());
+    char datestr[10];
+    int year = dt.year()-2000;
+    sprintf(datestr, "%02d%02d%02d", year, dt.month(), dt.day());
+    Serial.println(datestr);
     return String(datestr);
+}
+
+String ageFromDate(String dateStr) {
+    DateTime dt = stringToDateTime(dateStr);
+    DateTime now = rtc.now();
+    int ageInMonths = (now.year() - dt.year()) * 12 + (now.month() - dt.month());
+    if (ageInMonths < 18) {
+        return String(ageInMonths) + " mths";
+    } else {
+        float ageInYears = ageInMonths / 12;
+        return String(ageInYears, 1) + " yrs ";
+    }
+}
+
+String whpSafeDate(String dateStr, String whp) {
+    DateTime dt = stringToDateTime(dateStr);
+    int daysToAdd = whp.toInt();
+        
+    DateTime newDt = dt + TimeSpan(daysToAdd, 0, 0, 0);
+    return dateTimeToString(newDt);
 }

@@ -10,12 +10,16 @@
 #include "otrScanning.h"
 #include "otrFeedback.h"
 #include "otrTime.h"
+#include "otrData.h"
 
 RTC_DS3231 rtc;
 WL_134A_RFID rfid;
 RFIDReader reader;
 LED led;
 VIBRATE vibrate;
+RECORDS records;
+
+Species species = Sheep;
 
 LilyGo_Class amoled;
 lv_obj_t *label1;
@@ -46,23 +50,26 @@ void lv_example_get_started_1(void)
     
 
     /*Touch Test*/
-    touchTest = lv_label_create(lv_scr_act());
-    lv_obj_align(touchTest, LV_ALIGN_BOTTOM_MID, 0, -50);
-    lv_obj_set_style_text_font(touchTest, &lv_font_montserrat_28, 0);
-    lv_label_set_text(touchTest, "Touch Test");
+    // touchTest = lv_label_create(lv_scr_act());
+    // lv_obj_align(touchTest, LV_ALIGN_BOTTOM_MID, 0, -50);
+    // lv_obj_set_style_text_font(touchTest, &lv_font_montserrat_28, 0);
+    // lv_label_set_text(touchTest, "Touch Test");
 
     amoled.setHomeButtonCallback([](void *ptr) {
         Serial.println("Home key pressed!");
+        
         static uint32_t checkMs = 0;
         if (millis() > checkMs) {
             _ui_screen_change(&ui_Main, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_Main_screen_init);
             led.fade.status = true;
             vibrate.error();
-            uint16_t battVoltageTest = amoled.getBattVoltage();
-            double battVoltageInVolts = battVoltageTest / 1000.0;
-            uint16_t vbusVoltageMV = readVbusVoltage();
-            double vbusVoltage = vbusVoltageMV / 1000.0;
-            lv_label_set_text_fmt(touchTest, "Battery: %.1fV\nVBUS: %.1fV", battVoltageInVolts, vbusVoltage);
+            getStorageInfo();
+            listDir("/Sheep/sessions/");
+            // uint16_t battVoltageTest = amoled.getBattVoltage();
+            // double battVoltageInVolts = battVoltageTest / 1000.0;
+            // uint16_t vbusVoltageMV = readVbusVoltage();
+            // double vbusVoltage = vbusVoltageMV / 1000.0;
+            // lv_label_set_text_fmt(touchTest, "Battery: %.1fV\nVBUS: %.1fV", battVoltageInVolts, vbusVoltage);
             //playWaltzingMatilda(buzzerPin);
             // updateTimeToScreen();
             
@@ -70,9 +77,9 @@ void lv_example_get_started_1(void)
         }
         checkMs = millis() + 200;
         lv_timer_create([](lv_timer_t *t) {
-            lv_label_set_text(touchTest, "Touch Test");
+            // lv_label_set_text(touchTest, "Touch Test");
             
-            lv_timer_del(t);
+            // lv_timer_del(t);
         }, 2000, NULL);
     }, NULL);
 
@@ -104,7 +111,7 @@ void setup()
             delay(1000);
         }
     }
-
+    initFileSystem();
     beginLvglHelper(amoled);
     amoled.setRotation(rotation);
     lv_disp_drv_t *drv = lv_disp_get_default()->driver;
@@ -140,6 +147,8 @@ void setup()
     updateBatteryImage();
     updateTimeToScreen();
     reader.updateScanIcon();
+    
+    
 
 }
 
@@ -164,10 +173,10 @@ void loop()
         if (Serial1.available() >= rfidMessageLength) {
             rfid.readPacket();
             WL_134A_RFID::rfidRead scanResult = rfid.getReading();
-            lv_obj_set_style_text_font(ui_Main_Label1, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text_fmt(ui_Main_Label1, "SCAN OK \n %s", scanResult.rfidID);
+            // lv_obj_set_style_text_font(ui_Main_Label1, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
+            // lv_label_set_text_fmt(ui_Main_Label1, "SCAN OK \n %s", scanResult.rfidID);
             lv_label_set_text_fmt(ui_Scan_LabelTagID, "%s", scanResult.rfidID);
-            lv_label_set_text(ui_Scan_LabelMain, "SCAN OK");
+            lv_label_set_text(ui_Scan_ButtonLabel, "SCAN OK");
             led.flash();
             vibrate.success();
 

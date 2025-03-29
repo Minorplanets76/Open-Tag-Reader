@@ -2,14 +2,14 @@
 #ifndef OTRDATA_H
 #define OTRDATA_H
 
-#include <CSV_Parser.h>
+
 #include <vector>
 #include <LittleFS.h>
 #include "otrTime.h"
 
 extern RTC_DS3231 rtc;
 
-String traitsFilePath = "/traits.csv";
+
 class BUCKETFILE {
     public:
         // bucket file in follwing format
@@ -112,15 +112,15 @@ class RECORDS {
         String recordsFilePath = "/records.csv";
         String session;
         String lastSessions[5];
-        String lastSessionFilePath = "sessions/last_sessions.txt";
-        String sessionFilePath = "session/yyyymmdd_1.csv";
+        String lastSessionFilePath = "/sessions/last_sessions.txt";
+        String sessionFilePath = "session/yymmdd_1.csv";
         String sessionHeader = "Index,RFID,Timestamp,Location,Status,Group,Weight,Trait,Treat,Comment/n";
         void readFile();
         void count();
         void create();
         void addNew(Records);
         void createSession();
-        void readLastSessions();
+        String readLastSessions();
         Records* find(String& rfid, int& num);
         File recordsFile;
         bool recordsFilechanged = false;    
@@ -135,25 +135,54 @@ class RECORDS {
 
 };
 
+class TREATMENTS {
+    public:
+        String treatmentsFilePath = "/treatments.csv";
+        String productsFilePath = "/products.csv";
+        int numProducts;
+        int numHumans;
+        struct Treatments    {
+            uint32_t index;
+            DateTime date;
+            String treatment; //eg drench, vaccinate etc
+            String product; //product name
+            String batch;
+            String dose;
+            uint8_t whp; //witholding period (days)
+            String appliedBy;
+            String comment;
+        };
+        struct Products    {
+            String name;
+            String category;
+            String whp_days;
+            String batchNum;
+            String dosage[];
+        };
+        struct Humans    {
+            String name;
+            String initials;
+        };
+        void add(Treatments);
+        void read();
+        void create();
+        void loadProducts();
+        void loadHumans();
+    private:
+    Products* product;
+    Treatments* treatment;
+    Humans* human;
+};
+
 const String speciesStrings[2] = {"Sheep", "Cattle"};
 const String speciesGroups[2] = {"Flock", "Herd"};
-        enum Species {
+enum Species {
     Sheep,
     Cattle
 };
-Species species = Sheep;
 
-struct Treatment    {
-    uint32_t index;
-    DateTime date;
-    String treatment; //eg drench, vaccinate etc
-    String product; //product name
-    String batch;
-    String dose;
-    uint8_t whp; //witholding period (days)
-    String appliedBy;
-    String comment;
-};
+
+
 
 struct TraitOptions {
     String optionName;
@@ -162,7 +191,7 @@ struct Traits {
     String traitName;
     std::vector<TraitOptions> options;
 };
-std::vector<Traits> traits;
+
 
 struct Transfers {
     String rfid;
@@ -179,7 +208,7 @@ struct Locations {
     String name;
     String PIC;
 };
-Locations* location;
+
 enum Status {
     ALIVE,
     DEAD,
@@ -192,8 +221,7 @@ enum TagStatus {
     Inactive
 };
 
-Status status = ALIVE;
-TagStatus tagStatus = Unused;
+
 
 struct tags {
     String pic;

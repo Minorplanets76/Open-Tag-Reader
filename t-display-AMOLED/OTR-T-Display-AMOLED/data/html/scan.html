@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Animal and Tag Information</title>
+	<style>
+		body {
+			font-size: 24px;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		.tabs {
+			overflow: hidden;
+			border: 1px solid #ccc;
+			background-color: #f0f0f0;
+			font-size: 36px;
+		}
+		.tabs ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+		}
+		.tabs li {
+			margin-right: 20px;
+		}
+		.tabs a {
+			text-decoration: none;
+			color: #337ab7;
+		}
+		.tabs a:hover {
+			color: #23527c;
+		}
+		.tab-content {
+			padding: 20px;
+			border: 1px solid #ccc;
+			background-color: #fff;
+		}
+		.tab-content h2 {
+			margin-top: 0;
+			font-size: 36px;
+		}
+		.field {
+			margin-bottom: 20px;
+		}
+		.field label {
+			display: inline-block;
+			width: 150px;
+			margin-right: 10px;
+			font-size: 24px;
+		}
+		.field input, .field select {
+			width: 200px;
+			height: 40px;
+			font-size: 24px;
+			padding: 10px;
+			margin-bottom: 20px;
+			border: 1px solid #ccc;
+		}
+	</style>
+</head>
+<body>
+	<div class="tabs">
+		<ul>
+			<li><a href="#animal" class="tab-link" data-tab="animal">Animal</a></li>
+			<li><a href="#tags" class="tab-link" data-tab="tags">Tags</a></li>
+		</ul>
+	</div>
+	<div class="tab-content">
+		<div id="animal" class="tab-pane active">
+			<h2>Animal Information</h2>
+			<!-- Animal tab content -->
+			<div class="field">
+				<label for="breed">Breed:</label>
+				<input type="text" id="breed" name="breed">
+			</div>
+			<div class="field">
+				<label for="type">Type:</label>
+				<input type="text" id="type" name="type">
+			</div>
+			<div class="field">
+				<label for="name">Name:</label>
+				<input type="text" id="name" name="name">
+			</div>
+			<div class="field">
+				<label for="rfid">RFID:</label>
+				<input type="text" id="rfid" name="rfid">
+			</div>
+			<div class="field">
+				<label for="tagged">Tagged:</label>
+				<input type="date" id="tagged" name="tagged">
+			</div>
+			<div class="field">
+				<label for="gender">Gender:</label>
+				<select id="gender" name="gender">
+					<option value="M">Male</option>
+					<option value="F">Female</option>
+				</select>
+			</div>
+			<div class="field">
+				<label for="mother">Mother:</label>
+				<input type="text" id="mother" name="mother">
+			</div>
+			<div class="field">
+				<label for="father">Father:</label>
+				<input type="text" id="father" name="father">
+			</div>
+			<div class="field">
+				<label for="multi-birth">Multi Birth:</label>
+				<input type="text" id="multi-birth" name="multi-birth">
+			</div>
+			<div class="field">
+				<label for="location">Location:</label>
+				<select id="location" name="location">
+					<option value="">Select Location</option>
+				</select>
+			</div>
+			<div class="field">
+				<label for="group">Group:</label>
+				<select id="group" name="group">
+					<option value="">Select Group</option>
+				</select>
+			</div>
+			<div class="field">
+				<label for="status">Status:</label>
+				<select id="status" name="status">
+					<option value="Alive">Alive</option>
+					<option value="Dead">Dead</option>
+					<option value="Sold">Sold</option>

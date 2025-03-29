@@ -7,6 +7,7 @@
 #include "ui_events.h"
 #include <Arduino.h>
 #include "otrTime.h"
+#include "otrData.h"
 #include "otrFeedback.h"
 #include "otrScanning.h"
 
@@ -17,18 +18,20 @@ extern LED led;
 extern int ledPin;
 extern int buzzerPin;
 extern void playNote(int buzzerPin);
+extern RECORDS records;
+extern Species species;
 void btn_event_cb(lv_event_t * e)
 {
 	    static uint8_t cnt = 0;
         cnt++;
 
         /*Get the first child of the button which is the label and change its text*/
-        lv_label_set_text_fmt(ui_Main_Label2, "Button: %d", cnt);
+        //lv_label_set_text_fmt(ui_Main_Label2, "Button: %d", cnt);
         // toggle the LED when the button is pressed
         //toggleLed(ledPin);
-        playNote(buzzerPin);
-        vibrate.tap();
-        led.toggle();
+        // playNote(buzzerPin);
+        // vibrate.tap();
+        // led.toggle();
 }
 
 void setTimeManual(lv_event_t * e)
@@ -61,6 +64,14 @@ void UI_MAIN_SCREEN_LOAD(lv_event_t * e)
 {
 	// updateTimeToScreen();
         // updateBatteryImage();
+        RECORDS data;
+        lv_roller_set_options(ui_Main_RollerRecentSessions, data.readLastSessions().c_str(), LV_ROLLER_MODE_NORMAL);
+        _ui_roller_set_property(ui_Main_RollerRecentSessions, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, 4);
+        Serial.print("From main screen load: ");
+        Serial.print(data.readLastSessions().c_str());
+        Serial.print("end");
+        
+
 }
 
 
@@ -147,3 +158,20 @@ void SetTimeScreenLoaded(lv_event_t * e)
         }
         _ui_roller_set_property(ui_Time_RollerMinute, _UI_ROLLER_PROPERTY_SELECTED_WITH_ANIM, now.minute());
 }
+
+void newSession(lv_event_t * e)
+{
+        //copy last session to records 
+	_ui_screen_change(&ui_Scan, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_Scan_screen_init);
+        records.lastSessionFilePath = "/" + speciesStrings[species] + "/sessions/last_sessions.txt";
+        records.createSession();
+}
+
+void continueSession(lv_event_t * e)
+{
+        records.recordsCounted = false;
+
+        _ui_screen_change(&ui_Scan, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_Scan_screen_init);
+
+}
+ 

@@ -256,7 +256,7 @@ void VIBRATE::stop() {
     status = 0;
     repeat = 0;
     active = 0;
-    Serial.println("buzz stop");
+    
 }
 void VIBRATE::toggle() {
      digitalWrite(vibratePin, !digitalRead(vibratePin));

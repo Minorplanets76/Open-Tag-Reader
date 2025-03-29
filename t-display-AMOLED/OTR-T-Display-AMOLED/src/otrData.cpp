@@ -1,4 +1,6 @@
 #include "otrData.h"
+#include "otrFileHandling.h"
+extern Species species;
 
 void BUCKETFILE::readBucketFile() {
     //Open file
@@ -76,83 +78,112 @@ bool BUCKETFILE::checkNew() {
 
 void BUCKETFILE::addTag() {
     tags.print(csvBucket);
+    tags.print(",Unsed");
     tags.println();
     rowsAdded++;
 }
 
 void readLocations() {
     uint8_t numLocations = 0;
+    Locations* location = nullptr;
     File locationFile = LittleFS.open("/locations.csv");
-    if(!locationFile) {
-        Serial.println("Failed to open location file");
-        return;
-    }
-    while (locationFile.available()) {
-        // Read a row
-        String locationRow = locationFile.readStringUntil('\n');
-        if (numLocations == 0) {
-            //Skip header row
-            locationRow = locationFile.readStringUntil('\n');
+    if (locationFile) {
+        while (locationFile.available()) {
+            locationFile.readStringUntil('\n');
+            numLocations++;
         }
-        //Pick out columns
-        location[numLocations].name = locationRow.substring(0, locationRow.indexOf(","));
-        location[numLocations].PIC = locationRow.substring(locationRow.indexOf(",")+1, locationRow.length());
-        numLocations++;
+        locationFile.seek(0); // move back to the beginning of the file
+        location = new Locations[numLocations-1]; // allocate memory for the array
+        for (uint8_t i = 0; i < numLocations; i++) {
+            String locationRow = locationFile.readStringUntil('\n');
+            if (i == 0) {
+                // Skip header row
+                continue;
+            }
+            // Pick out columns
+            location[i].name = locationRow.substring(0, locationRow.indexOf(","));
+            location[i].PIC = locationRow.substring(locationRow.indexOf(",") + 1, locationRow.length());
+        }
+        locationFile.close();
     }
-    Serial.print(numLocations);
-    Serial.println(" locations read");
-    locationFile.close();
-    for (int i = 0; i < numLocations; i++) {
-        Serial.print(location[i].name);
-        Serial.println(location[i].PIC);
-    }
+    
 }
-
+//INCOMPLETE
 void readTraitsFromCSV() {
     // Reads traits from csv
     // Format of file is Traitname followed by options separated by commas
     // User can define their own traits therefore no fixed dimensions
-    uint8_t numTraits = 0;
-    uint8_t numTraitOptions = 0;
+    // uint8_t numTraits = 0;
+    // Traits* trait = nullptr;
+    // File traitsFile = LittleFS.open(traitsFilePath);
 
-    File traitsFile = LittleFS.open(traitsFilePath);
-    if(!traitsFile) {
-        Serial.println("Failed to open traits file");
-        return;
-    }
-    while (traitsFile.available()) {
-        // Read a row
-        String traitRow = traitsFile.readStringUntil('\n');
-        if (numTraits == 0) {
-            //Skip header row
-            traitRow = traitsFile.readStringUntil('\n');
-        }
-        String traitName = traitRow.substring(0, traitRow.indexOf(","));
-        Traits newTrait;
-        newTrait.traitName = traitName;
-        String allTraitOptions = traitRow.substring(traitRow.indexOf(",")+1, traitRow.length());
-        int optionCommaIndex;
-        while ((optionCommaIndex = allTraitOptions.indexOf(",")) != -1) {
-            String option = allTraitOptions.substring(0, optionCommaIndex);
-            TraitOptions newOption;
-            newOption.optionName = option;
-            newTrait.options.push_back(newOption);           
-        }
-        traits.push_back(newTrait);
-    }
-    traitsFile.close();
+    // if (traitsFile) {
+    //     while (traitsFile.available()) {
+    //         traitsFile.readStringUntil('\n');
+    //         numTraits++;
+    //     }
+    //     traitsFile.seek(0); // move back to the beginning of the file
+    //     trait = new Traits[numTraits-1]; // allocate memory for the array
+    //     while (traitsFile.available()) {
+    //         String traitRow = traitsFile.readStringUntil('\n');
+    //         if (numTraits == 0) {
+    //             // Skip header row
+    //             continue;
+    //         }
+    //         // Pick out columns
+    //         trait[numTraits-1].traitName = traitRow.substring(0, traitRow.indexOf(","));
+    //         String allTraitOptions = traitRow.substring(traitRow.indexOf(",") + 1, traitRow.length());
+    //         int optionCommaIndex;
+    //         while ((optionCommaIndex = allTraitOptions.indexOf(",")) != -1) {
+    //             String option = allTraitOptions.substring(0, optionCommaIndex);
+    //             trait[numTraits-1].options.push_back(option);
+    //             allTraitOptions = allTraitOptions.substring(optionCommaIndex + 1, allTraitOptions.length());
+    //         }
+    //         // Add the last option
+    //         trait[numTraits-1].options.push_back(allTraitOptions);
+    //     }
+    // }
+ 
+    // while (traitsFile.available()) {
+    //     // Read a row
+    //     String traitRow = traitsFile.readStringUntil('\n');
+    //     if (numTraits == 0) {
+    //         // Skip header row
+    //         traitRow = traitsFile.readStringUntil('\n');
+    //     }
+    //     String traitName = traitRow.substring(0, traitRow.indexOf(","));
+    //     Traits newTrait;
+    //     newTrait.traitName = traitName;
+    //     String allTraitOptions = traitRow.substring(traitRow.indexOf(",") + 1, traitRow.length());
+    //     int optionCommaIndex;
+    //     while ((optionCommaIndex = allTraitOptions.indexOf(",")) != -1) {
+    //         String option = allTraitOptions.substring(0, optionCommaIndex);
+    //         TraitOptions newOption;
+    //         newOption.optionName = option;
+    //         newTrait.options.push_back(newOption);
+    //         allTraitOptions = allTraitOptions.substring(optionCommaIndex + 1, allTraitOptions.length());
+    //     }
+    //     // Add the last option
+    //     TraitOptions newOption;
+    //     newOption.optionName = allTraitOptions;
+    //     newTrait.options.push_back(newOption);
+    //     // Add the trait to the traits vector
+    //     traits.push_back(newTrait);
+    //     numTraits++;
+    // }
+    // traitsFile.close();
 }
 
-
+//Not working
 void printTraits() {
-    for (size_t i = 0; i < traits.size(); i++) {
-        Serial.print("Trait: ");
-        Serial.println(traits[i].traitName);
-        for (size_t j = 0; j < traits[i].options.size(); j++) {
-            Serial.print("  Option: ");
-            Serial.println(traits[i].options[j].optionName);
-        }
-    }
+    // for (size_t i = 0; i < traits.size(); i++) {
+    //     Serial.print("Trait: ");
+    //     Serial.println(traits[i].traitName);
+    //     for (size_t j = 0; j < traits[i].options.size(); j++) {
+    //         Serial.print("  Option: ");
+    //         Serial.println(traits[i].options[j].optionName);
+    //     }
+    // }
 }
 
 ANIMALS::ANIMALS()  {
@@ -161,6 +192,7 @@ ANIMALS::ANIMALS()  {
 }
     
 void ANIMALS::readFile() {
+    Species species = Sheep;
     animalFilePath = "/" + speciesStrings[species] + "/" + speciesGroups[species] + ".csv";
     animalFile = LittleFS.open(animalFilePath);
     if (!animalFile) {
@@ -249,7 +281,8 @@ void ANIMALS::modify(AnimalsFile updatedAnimal) {
     }
 }
 
-void ANIMALS::archive(AnimalsFile animalToRemove) {   
+void ANIMALS::archive(AnimalsFile animalToRemove) {  
+    Species species = Sheep; 
     animalArchiveFilePath = "/" + speciesStrings[species] + "/archive/" + speciesGroups[species] + "_archive.csv";
     File animalArchiveFile = LittleFS.open(animalArchiveFilePath, FILE_APPEND);
     if (!animalArchiveFile) {
@@ -295,7 +328,7 @@ ANIMALS::AnimalsFile& ANIMALS::find(String& rfid) {
     }
     throw std::runtime_error("Animal not found");
 }
-
+//UNFINISHED
 void ANIMALS::create() {
     //pull data from ui
 }
@@ -345,8 +378,9 @@ void ANIMALS::renewFile() {
     }
     newFile.close();
 }
-
+//UNFINISHED
 void RECORDS::readFile() {
+    Species species = Sheep;
     recordsFilePath = "/" + speciesStrings[species] + "/records.csv";
     recordsFile = LittleFS.open(recordsFilePath, "r");
     if (!recordsFile) {
@@ -366,6 +400,7 @@ void RECORDS::count() {
     recordsFile.close();
     recordsCounted = true;
 }
+//UNFINISHED
 void RECORDS::create() {
     //pull data from ui
 }
@@ -397,11 +432,14 @@ void RECORDS::addNew(Records newRecord) {
 void RECORDS::createSession() {
     //session name is current date with sequential number yyyymmdd_1, yyyymmdd_2 etc
     //in order to continue a session after power down etc last 5 sessions stored in last_sessions.txt
-    readLastSessions();
+
     DateTime dt = rtc.now();
     String dateStr = dateToSessionFormat(dt);
-    if(lastSessions[4].substring(0, 8) == dateStr) {
-        int num = lastSessions[4].substring(9).toInt();
+    readLastSessions();
+    Serial.println(dateStr);
+    Serial.println(lastSessions[4].substring(0, 6));
+    if(lastSessions[4].substring(0, 6) == dateStr) {
+        int num = lastSessions[4].substring(7).toInt();
         session = dateStr + "_" + String(num + 1);
     } else {
         session = dateStr + "_1";
@@ -411,27 +449,47 @@ void RECORDS::createSession() {
         newSessions[i-1] = lastSessions[i];
     }
     newSessions[4] = session;
+    if (!LittleFS.remove(lastSessionFilePath)) {
+        Serial.println("Failed to remove last sessions file");
+        return;
+    }
     File file = LittleFS.open(lastSessionFilePath, "w");
-    if (!file) {
+     if (!file) {
         Serial.println("Failed to create last sessions file");
         return;
     }
+
     for (int i = 0; i < 5; i++) {
         file.println(newSessions[i]);
     }
+  
     file.close();
-
+    sessionFilePath = "/" + speciesStrings[species] + "/sessions/" + session + ".csv";
+    File sessionFile = LittleFS.open(sessionFilePath, "w");
+    if (!sessionFile) {
+        Serial.println("Failed to create session file");
+        return;
+    }
+    sessionFile.println(sessionHeader);
+    recordsFilePath = sessionFilePath;
+    numRecords = 0;
+    recordsCounted = true;
+    sessionFile.close();
 }
 
-void RECORDS::readLastSessions() {
+String RECORDS::readLastSessions() {
+    
     lastSessionFilePath = "/" + speciesStrings[species] + "/sessions/last_sessions.txt";
+    
+    String sessionsDropdown;
+
     File file = LittleFS.open(lastSessionFilePath, "r");
     if (!file) {
         // Create the file if it doesn't exist
         file = LittleFS.open(lastSessionFilePath, "w");
         if (!file) {
             Serial.println("Failed to create last sessions file");
-            return;
+            return "error";
         }
         // Initialize the file with empty lines
         for (int i = 0; i < 5; i++) {
@@ -446,9 +504,13 @@ void RECORDS::readLastSessions() {
     while (file.available() && i < 5) {
         String line = file.readStringUntil('\n');
         lastSessions[i] = line;
+        sessionsDropdown = sessionsDropdown + line + '\n';
         i++;
     }
     file.close();
+    sessionsDropdown = sessionsDropdown.substring(0, sessionsDropdown.length() - 1);
+    return sessionsDropdown;
+    
 }
 RECORDS::Records* RECORDS::find(String& rfid, int& num) {
     recordsFile = LittleFS.open(recordsFilePath, "r");
@@ -489,3 +551,79 @@ RECORDS::Records* RECORDS::find(String& rfid, int& num) {
     return thisRfid;
     
 }
+//UNFINISHED
+void TREATMENTS::add(Treatments newTreatment) {
+
+}
+//UNFINISHED
+void TREATMENTS::read() {
+
+}
+//UNFINISHED
+void TREATMENTS::create() {
+    //pull data from ui
+    
+}
+
+void TREATMENTS::loadProducts() {
+    Species species = Sheep;
+    productsFilePath = "/" + speciesStrings[species] + "/treatments/products.csv";
+    File productsFile = LittleFS.open(productsFilePath, "r");
+    if (!productsFile) {
+        Serial.println("Failed to open products file");
+        return;
+    }
+
+    String header = productsFile.readStringUntil('\n');
+    numProducts = 0;
+    
+
+    // Read each row and allocate memory for the product struct
+    while (productsFile.available()) {
+        String productRow = productsFile.readStringUntil('\n');
+        int columnNum = 0;
+        int startIndex = 0;
+        String columns[20];
+        int endIndex = productRow.indexOf(',');
+        while (endIndex != -1) {
+            String column = productRow.substring(startIndex, endIndex);
+            startIndex = endIndex + 1;
+            endIndex = productRow.indexOf(',', startIndex);
+            columns[columnNum] = column;
+            columnNum++;           
+        }
+
+        product[numProducts].name = columns[0];
+        product[numProducts].category = columns[1];
+        product[numProducts].whp_days = columns[2];
+        product[numProducts].batchNum = columns[3];
+        int numDosages = columnNum - 4;
+        for (int i = 0; i < numDosages; i++) {
+            product[numProducts].dosage[i] = columns[i + 4];
+        }
+        numProducts++;
+    }
+
+    productsFile.close();
+}
+
+void TREATMENTS::loadHumans() {
+    
+    File humansFile = LittleFS.open("/humans.csv", "r");
+    if (!humansFile) {
+        Serial.println("Failed to open humans file");
+        return;
+    }
+    numHumans = 0;
+    String header = humansFile.readStringUntil('\n');
+    while (humansFile.available()) {
+        String humansRow = humansFile.readStringUntil('\n');
+        human[numHumans].name = humansRow.substring(0, humansRow.indexOf(','));
+        human[numHumans].initials = humansRow.substring(humansRow.indexOf(',') + 1);
+        numHumans++;
+    }
+
+    humansFile.close();
+
+}
+

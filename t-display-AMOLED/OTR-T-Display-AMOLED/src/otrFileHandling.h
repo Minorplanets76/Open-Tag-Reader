@@ -21,12 +21,12 @@ void copyFileFromLittleFStoSD(const char* sourcePath, const char* destinationDir
                                 const char* destinationFilename);
 void moveFileFromLittleFStoSD(const char* sourcePath, const char* destinationDirectory, 
                                 const char* destinationFilename);
-void printFileContents(const char* filePath);
+void printFileContents(String filePath);
 void getStorageInfo(void);
 void createExampleFile(void);
 void appendNewLine(const char* filePath, char** bucketRow);
 String create_new_list(void);
-
+void listDir(const char * dirname);
 
 
 

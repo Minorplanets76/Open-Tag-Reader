@@ -14,10 +14,10 @@ void initFileSystem() {
 void SD_init(void)
 {
     bool mounted = amoled.installSD();
-    //lv_label_set_recolor(ui_Main_Label1, true);
+    
     if (!mounted) {
         Serial.println("SD card installation failed");
-        //lv_label_set_text(ui_Main_Label1, "#ff0000 SD card \nFailed");
+        
         return;
 
     } else {
@@ -25,9 +25,9 @@ void SD_init(void)
         uint32_t totalBytes = SD.totalBytes() / (1024 * 1024);
         uint32_t usedBytes = SD.usedBytes() / (1024 * 1024);
 
-        Serial.printf("SD card installed. Size: %d MB, Total: %d MB, Used: %d MB\n", size, totalBytes, usedBytes);
+        //Serial.printf("SD card installed. Size: %d MB, Total: %d MB, Used: %d MB\n", size, totalBytes, usedBytes);
 
-        //lv_label_set_text_fmt(ui_Main_Label1, "#00ff00 SD CARD OK \nSize: %d MB", size);
+       
     }
 
 }
@@ -41,11 +41,11 @@ void copyFileFromLittleFStoSD(const char* sourcePath, const char* destinationDir
         return;
     }
 
-    if (!SD_MMC.exists(destinationDirectory)) {
-        SD_MMC.mkdir(destinationDirectory);
+    if (!SD.exists(destinationDirectory)) {
+        SD.mkdir(destinationDirectory);
     }
 
-    File destinationFile = SD_MMC.open(destinationPath.c_str(), "w");
+    File destinationFile = SD.open(destinationPath.c_str(), "w");
     if (!destinationFile) {
         Serial.println("Failed to create destination file.");
         sourceFile.close();
@@ -91,7 +91,7 @@ void moveFileFromLittleFStoSD(const char* sourcePath, const char* destinationDir
     LittleFS.remove(sourcePath);
 }
 
-void printFileContents(const char* filePath) {
+void printFileContents(String filePath) {
     File file = LittleFS.open(filePath, "r");
     if (!file) {
         Serial.println("Failed to open file.");
@@ -108,19 +108,20 @@ void printFileContents(const char* filePath) {
             Serial.print(String(lineNumber) + ": ");
         }
     }
+    Serial.println();
 
     file.close();
 }
 
 void getStorageInfo() {
-    uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024); //MB
-    uint64_t cardUsed = SD_MMC.usedBytes() / (1024 * 1024); //MB
+    uint32_t size = SD.cardSize() / (1024 * 1024);
+    uint32_t totalBytes = SD.totalBytes() / (1024 * 1024);
+    uint32_t usedBytes = SD.usedBytes() / (1024 * 1024);
+    Serial.printf(" SD card Size: %d MB, Total: %d MB, Used: %d MB\n", size, totalBytes, usedBytes);
     uint64_t psramSize = ESP.getPsramSize() / 1024; //KB
     uint64_t flashSize = ESP.getFlashChipSize() / 1024; //KB
     uint64_t littlefsSize = LittleFS.totalBytes() / 1024; //KB
     uint64_t littlefsUsed = LittleFS.usedBytes() / 1024; //KB
-    Serial.printf("SD Card Size: %lluMB\n", cardSize);
-    Serial.printf(" SD Card used: %lluMB\n", cardUsed);
     Serial.printf(" psram size: %d kb\r\n", psramSize);
     Serial.printf(" FLASH size: %d kb\r\n", flashSize);
     Serial.printf(" LittleFS total: %d kb\r\n", littlefsSize);
@@ -180,3 +181,32 @@ String create_new_list() {
     
     return fileName;
 }
+
+void listDir(const char * dirname) {
+  Serial.printf("Listing directory: %s\n", dirname);
+
+  File root = LittleFS.open(dirname);
+  if (!root) {
+    Serial.println("- failed to open directory");
+    return;
+  }
+  if (!root.isDirectory()) {
+    Serial.println(" - not a directory");
+    return;
+  }
+
+  File file = root.openNextFile();
+  while (file) {
+    if (file.isDirectory()) {
+      Serial.print("DIR : ");
+      Serial.println(file.name());
+    } else {
+      Serial.print("FILE: ");
+      Serial.print(file.name());
+      Serial.print("\tSIZE: ");
+      Serial.println(file.size());
+    }
+    file = root.openNextFile();
+  }
+}
+
