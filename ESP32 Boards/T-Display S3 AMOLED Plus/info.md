@@ -1,0 +1,1 @@
+This variant includes integrated sd card slot and RTC, which solves having additional modules.  It also has a power management chip. it has a good enclosure which may simplify that aspect. A carrier board will still simplify wiring. 
