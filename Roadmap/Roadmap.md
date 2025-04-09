@@ -15,13 +15,13 @@ The Open-Tag-Reader project is an ESP-based RFID ear tag scanning solution desig
 ### **Phase 1: Repository Cleanup & Organization**
 ✅ Dig up the project and restart it!
 
-🔲 Restructure file and folder layout for better navigation.
+✅ Restructure file and folder layout for better navigation.
 
 🔲 RFID information, carrier boards and code.
 
-🔲 ESP module organised into folders.
+✅ ESP module organised into folders.
 
-🔲 Define and document coding standards.
+✅ Define and document coding standards.
 
 ### **Phase 2: Core Functionality Development**
 🔲 Implement reliable RFID tag scanning with ESP-based hardware.
