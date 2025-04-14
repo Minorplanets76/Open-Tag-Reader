@@ -15,22 +15,49 @@ The Open-Tag-Reader project is an ESP-based RFID ear tag scanning solution desig
 ### **Phase 1: Repository Cleanup & Organization**
 ✅ Dig up the project and restart it!
 
-🔲 Restructure file and folder layout for better navigation.
+✅ Restructure file and folder layout for better navigation.
 
 🔲 RFID information, carrier boards and code.
 
-🔲 ESP module organised into folders.
+✅ ESP module organised into folders.
 
 🔲 Define and document coding standards.
 
 ### **Phase 2: Core Functionality Development**
 🔲 Implement reliable RFID tag scanning with ESP-based hardware.
+* Serial Comms
+* Handling/decoding incoming messages
+* Error checking, and duplicate scan handling
+* Switching RFID reader on/off
 
 🔲 Develop a data processing system to extract and store tag details.
+* tags.csv - contains tag data
+* Tag Status - Unused, Active, Inactive
+* bucket.csv - bucket file provided by manufacturer
 
 🔲 Develop CSV file handling to store scan records.
+* animals.csv - animal associated with tag 
+* Animal Status - Alive, Dead, Sold
+* records.csv
+* Groups - user definable - use to count and draft
+* Traits
+* Locations - PIC
+* Transfers - NLIS transfers and sale data
+* Vetinary Chemicals - Chemical register - LPA requirement
+* Treatments - Product, WHP - LPA requirement
+* Humans
+* Dogs
 
 🔲 Time setting and timestamping of scan records.
+* RTC integration
+* Time setting manual
+* Time setting NTP
+
+🔲 Basic UI
+* Session Mnagement - New, continue
+* Simple Count (unique tags in a seesion)
+* Advanced Count - by group, type, etc
+* Settings
 
 🔲 Scan feedback beeps and LED response.
 
@@ -41,14 +68,6 @@ The Open-Tag-Reader project is an ESP-based RFID ear tag scanning solution desig
 
 🔲 Battery holder and power switch.
 
-🔲 Scan checking - validity of scan checking for duplicate scans.
-
-🔲 Tag database - checking tag validity and currency.
-
-🔲 Basic session management (New, continue).
-
-🔲 Counting function (number of unique tags in a session).
-
 🔲 Implement power management for extended battery life.
 
 🔲 Ensure ruggedness and usability in field conditions.
@@ -56,9 +75,6 @@ The Open-Tag-Reader project is an ESP-based RFID ear tag scanning solution desig
 🔲 Test and refine the hardware and software integration.
 
 ### **Phase 4: Data Management**
-🔲 Define all the data to be recorded for each animal and their dependencies.
-
-🔲 Implement functionality to associate a tag with an animal.
 
 🔲 Store detailed information with each animal (e.g., breed, status, age, etc.).
 
