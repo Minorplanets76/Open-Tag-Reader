@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tag Image</title>
+<style>
+    body {
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+    }
+    .tag-container {
+        position: relative;
+        width: 310px;
+        background-color: #ccc;
+        margin: 20px auto;
+        padding: 20px;
+    }
+    .tag-image {
+        width: 310px;
+        height: 46px;
+    }
+    .nlis-overlay {
+        position: absolute;
+        top: 27px;
+        left: 145px;
+        width: 20px;
+        height: 28px;
+    }
+    .tag-text {
+        position: absolute;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+    }
+    .PIC {
+        top: 29px;
+        left: 50px;
+        font-size: 14px;
+    }
+    .NLIScode {
+        bottom: 30px;
+        left: 50px;
+        font-size: 14px;
+    }
+    .VisualID {
+        bottom: 32px;
+        right: 55px;
+        font-size: 26px;
+        font-family: "Arial Narrow", sans-serif;
+        font-weight: bold;
+        transform: scaleX(0.75);
+    }
+</style>
+</head>
+<body onload="updateTag()">
+<label for="tagColor">Select Tag Color:</label>
+<select id="tagColor" onchange="updateTag()">
+    <option value="BLACK">Black</option>
+    <option value="BLUE">Blue</option>
+    <option value="BROWN">Brown</option>
+    <option value="GREEN">Green</option>
+    <option value="GREY">Grey</option>
+    <option value="ORANGE">Orange</option>
+    <option value="PINK">Pink</option>
+    <option value="PURPLE">Purple</option>
+    <option value="RED">Red</option>
+    <option value="WHITE">White</option>
+    <option value="YELLOW">Yellow</option>
+</select>
+
+<div class="tag-container">
+    <img id="tagImage" src="BLACK.png" alt="Original" class="tag-image">
+    <img id="nlisOverlay" src="nlis_white.png" alt="Overlay" class="tag-image nlis-overlay">
+    <div id="picText" class="tag-text PIC">NK509384</div>
+    <div id="nlisText" class="tag-text NLIScode">ASU00141</div>
+    <div id="visualIDText" class="tag-text VisualID">CHAD 141</div>
+</div>
+
+<script>
+    function updateTag() {
+        const color = document.getElementById("tagColor").value;
+        document.getElementById("tagImage").src = color + ".png";
+        
+        // Black text for all colors except BLACK and PURPLE
+        const textColor = (color === "BLACK" || color === "PURPLE") ? "white" : "black";
+        
+        document.getElementById("picText").style.color = textColor;
+        document.getElementById("nlisText").style.color = textColor;
+        document.getElementById("visualIDText").style.color = textColor;
+        
+        // Change overlay image based on text color
+        document.getElementById("nlisOverlay").src = (textColor === "white") ? "nlis_white.png" : "nlis_black.png";
+    }
+</script>
+</body>
+</html>

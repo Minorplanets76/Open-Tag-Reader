@@ -23,6 +23,8 @@ The Open-Tag-Reader project is an ESP-based RFID ear tag scanning solution desig
 
 ✅ Define and document coding standards.
 
+🔲 Code for T-Display Plus
+
 ### **Phase 2: Core Functionality Development**
 🔲 Implement reliable RFID tag scanning with ESP-based hardware.
 * Serial Comms
@@ -68,7 +70,7 @@ The Open-Tag-Reader project is an ESP-based RFID ear tag scanning solution desig
 
 🔲 Battery holder and power switch.
 
-🔲 Implement power management for extended battery life.
+🔲 Implement power management for extended battery life.  Battery usage testing.
 
 🔲 Ensure ruggedness and usability in field conditions.
 
@@ -93,6 +95,8 @@ The Open-Tag-Reader project is an ESP-based RFID ear tag scanning solution desig
 
 ### **Phase 6: Additional Features & Enhancements**
 🔲 Implement session-based scanning to track multiple animals at once.
+
+🔲 OTG USB as Mass Storage Device - Adafruit TinyUSB library to link SD card
 
 🔲 Enable batch updates for treatments and group assignments.
 

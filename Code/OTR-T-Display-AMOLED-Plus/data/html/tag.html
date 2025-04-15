@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tag Image</title>
+<style>
+    body {
+        background-color: #f0f0f0; /* light grey */
+        font-family: Arial, sans-serif; /* set default font */
+    }
+    .tag-container {
+        position: relative;
+        width: 310px; /* set the width to 310 pixels */
+        background-color: #ccc; /* grey background for the container */
+        margin: 20px auto; /* center the container */
+        padding: 20px; /* add some padding */
+    }
+    .tag-image {
+        width: 310px; /* set the width to 310 pixels */
+        height: 46px; /* set the height to 46 pixels */
+    }
+    .nlis-overlay {
+        position: absolute;
+        top: 27px; /* adjust top position */
+        left: 145px; /* adjust left position */
+        width: 20px; /* set the width to 20 pixels */
+        height: 28px; /* set the height to 28 pixels */
+    }
+    .tag-text {
+        position: absolute;
+        color: white;   /* text is white for purple, black, grey and brown */
+        font-family: Arial, sans-serif; /* set font to Arial */
+        font-weight: bold; /* make the text bold */
+    }
+    .PIC {
+        top: 29px;
+        left: 50px;
+        font-size: 14px; /* set the font size to 14 pixels */
+    }
+    .NLIScode {
+        bottom: 30px;
+        left: 50px;
+        font-size: 14px; /* set the font size to 14 pixels */
+    }
+    .VisualID {
+        bottom: 32px;
+        right: 55px;
+        font-size: 26px; /* set the font size to 24 pixels */
+        font-family: "Arial Narrow", sans-serif;
+        font-weight: bold;
+        transform: scaleX(0.75);
+    }
+</style>
+</head>
+<body>
+<div class="tag-container">
+    <img src="BLACK.png" alt="Original" class="tag-image">
+    <img src="nlis_white.png" alt="Overlay" class="tag-image nlis-overlay">
+    <div class="tag-text PIC">NK509384</div>
+    <div class="tag-text NLIScode">ASU00141</div>
+    <div class="tag-text VisualID">CHAD 141</div>
+</div>
+</body>
+</html>

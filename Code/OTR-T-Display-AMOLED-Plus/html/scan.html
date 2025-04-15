@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan Data</title>
+  <style>
+    body {
+      background-color: #ccc; /* Set to the same grey as the tag image */
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    .tag-container {
+      position: relative;
+      width: 310px;
+      background-color: #ccc;
+      margin: 20px auto;
+      padding: 20px;
+      text-align: center; /* Center align the content */
+    }
+    .tag-image {
+      width: 310px;
+      height: 46px;
+    }
+    .nlis-overlay {
+      position: absolute;
+      top: 27px;
+      left: 145px;
+      width: 20px;
+      height: 28px;
+    }
+    .tag-text {
+      position: absolute;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+    }
+    /* Default position for text elements */
+    .PIC {
+      top: 29px;
+      left: 50px;
+      font-size: 14px;
+    }
+    .NLIScode {
+      bottom: 30px;
+      left: 50px;
+      font-size: 14px;
+    }
+    .VisualID {
+      bottom: 32px;
+      right: 55px;
+      font-size: 26px;
+      font-family: "Arial Narrow", sans-serif;
+      font-weight: bold;
+      transform: scaleX(0.75);
+    }
+    .tag-control {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .tag-control select {
+      font-size: 16px;
+      padding: 5px;
+    }
+    .test-button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .test-button:hover {
+      background-color: #0056b3;
+    }
+    /* Align the text at the top of the page */
+    .text-top {
+      text-align: center;
+      margin-bottom: 5px;
+      font-size: 14px;
+      
+    }
+  </style>
+</head>
+<body onload="updateTag()">
+  <h2>Scan Data</h2>
+  <div class="text-top">
+    <p>RFID: <span id="rfid">Waiting...</span></p>
+    <p>Tag NLIS ID: <span id="nlisID">Waiting...</span></p>
+  </div>
+
+  <!-- Tag Color Selection -->
+  <div class="tag-control">
+    <label for="tagColor">Select Tag Color:</label>
+    <select id="tagColor" onchange="updateTag()">
+      <option value="BLACK">Black</option>
+      <option value="BLUE">Blue</option>
+      <option value="BROWN">Brown</option>
+      <option value="GREEN">Green</option>
+      <option value="GREY">Grey</option>
+      <option value="ORANGE">Orange</option>
+      <option value="PINK">Pink</option>
+      <option value="PURPLE">Purple</option>
+      <option value="RED">Red</option>
+      <option value="WHITE">White</option>
+      <option value="YELLOW">Yellow</option>
+    </select>
+  </div>
+
+  <!-- Tag Image Display -->
+  <div class="tag-container">
+    <img id="tagImage" src="BLACK.png" alt="Original" class="tag-image">
+    <img id="nlisOverlay" src="nlis_white.png" alt="Overlay" class="tag-image nlis-overlay">
+    <div id="picText" class="tag-text PIC">NK509384</div>
+    <div id="nlisText" class="tag-text NLIScode">ASU00141</div>
+    <div id="visualIDText" class="tag-text VisualID">CHAD 141</div>
+  </div>
+
+  <!-- Test Button -->
+  <button class="test-button" onclick="simulateTagData()">Test</button>
+
+  <script>
+    // Example data for the test
+    const testData = [
+      {
+        rfid: "940 110035858091",
+        nlisID: "NK509384ASU00231",  // Full NLISID
+        visualID: "CHAD 001", // Set this to the expected VisualID
+        pic: "NK509384",
+        colour: "PURPLE"
+      },
+      {
+        rfid: "940 110035858092",
+        nlisID: "NK509384ASU00232",  // Full NLISID
+        visualID: "CHAD 002", // Set this to the expected VisualID
+        pic: "NK509384",
+        colour: "PINK"
+      }
+    ];
+
+    let currentDataIndex = 0;  // Keep track of the current data index
+
+    // Function to update the tag image, text colors, and overlay based on the selected tag color
+    function updateTag() {
+      const color = document.getElementById("tagColor").value;
+      const tagImage = document.getElementById("tagImage");
+      const overlayImage = document.getElementById("nlisOverlay");
+      const picText = document.getElementById("picText");
+      const nlisText = document.getElementById("nlisText");
+      const visualIDText = document.getElementById("visualIDText");
+
+      // Update the tag image based on the selected color
+      tagImage.src = color + ".png";
+      
+      // Determine text color based on tag color
+      const textColor = (["BLACK", "PURPLE"].includes(color)) ? "white" : "black";
+      
+      // Apply text color to the text elements
+      picText.style.color = textColor;
+      nlisText.style.color = textColor;
+      visualIDText.style.color = textColor;
+      
+      // Change overlay image based on text color
+      overlayImage.src = (textColor === "white") ? "nlis_white.png" : "nlis_black.png";
+    }
+
+    // Simulate passing the tag data and update the page
+    function simulateTagData() {
+      // Get the current line of data based on the index
+      const data = testData[currentDataIndex];
+      
+      // Update the RFID and other information
+      document.getElementById("rfid").innerHTML = data.rfid;
+      
+      document.getElementById("picText").innerHTML = data.pic;
+
+      // Update the NLIS ID with the full 16 characters
+      const nlisID = data.nlisID;  // Keep the full NLISID
+      document.getElementById("nlisID").innerHTML = nlisID;  // Display full NLISID
+
+      // Update the tag text over the image
+      document.getElementById("nlisText").innerHTML = nlisID.slice(8); // NLIS code (last 8 chars)
+      document.getElementById("visualIDText").innerHTML = data.visualID; // Visual ID
+
+      // Update the tag color and text color
+      document.getElementById("tagColor").value = data.colour;
+      updateTag();  // Update image and text color according to the selected color
+
+      // Increment the data index, loop back to the beginning if we reach the end
+      currentDataIndex = (currentDataIndex + 1) % testData.length;
+    }
+  </script>
+</body>
+</html>
